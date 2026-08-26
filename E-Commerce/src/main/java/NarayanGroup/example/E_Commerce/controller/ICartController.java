@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
                 @Valid @RequestBody AddCartRequestDTO request
         );
 
-    @GetMapping("{userId}/get")
+    @GetMapping(" {userId}/get")
     ResponseEntity<ResponseMessageUtilityDTO> getCart(@PathVariable(name = "userId") Long userId);
 
     @PutMapping("{userId}/{cartItemId}")
