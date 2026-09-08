@@ -6,8 +6,9 @@ import lombok.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "cart_items")
-@Data
+@Table(name = "cart_item")
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -17,31 +18,34 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * Many Cart Items -> One Cart
-     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id",
-            nullable = false)
+    @JoinColumn(
+            name = "cart_id",
+            nullable = false
+    )
     private Cart cart;
 
-    /**
-     * Many Cart Items -> One Product
-     */
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id",
-            nullable = false)
-        private Product product;
+    @JoinColumn(
+            name = "product_id",
+            nullable = false
+    )
+    private Product product;
 
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "price_at_addition", nullable = false)
-    private BigDecimal price_at_addition;
+    @Column(
+            name = "price_at_addition",
+            nullable = false,
+            precision = 19,
+            scale = 2
+    )
+    private BigDecimal priceAtAddition;
 
-    @Column(nullable = false)
+    @Column(name = "currency", nullable = false, length = 10)
     private String currency;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 }

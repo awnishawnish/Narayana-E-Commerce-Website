@@ -7,21 +7,29 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface IProductRepository extends JpaRepository<Product, Long> {
+public interface IProductRepository
+        extends JpaRepository<Product, Long> {
 
-    // ✅ CHANGED: old method was `List<Product> findByCategory(String category)`
-    // New: uses Pageable for pagination + filters out soft-deleted products
-    Page<Product> findByCategoryAndIsDeletedFalse(String category, Pageable pageable);
+    Page<Product> findByCategoryAndIsDeletedFalse(
+            String category,
+            Pageable pageable
+    );
 
-    // ✅ NEW: get ALL products (no category filter), excluding soft-deleted, with pagination
-    Page<Product> findByIsDeletedFalse(Pageable pageable);
+    Page<Product> findByIsDeletedFalse(
+            Pageable pageable
+    );
 
-    // ✅ NEW: search by title keyword (case-insensitive), excluding soft-deleted, with pagination
-    // Used for the search feature (user searches product by name)
     @Query("SELECT p FROM Product p WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.isDeleted = false")
-    Page<Product> searchByTitleKeyword(@Param("keyword") String keyword, Pageable pageable);
+    Page<Product> searchByTitleKeyword(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
 
-    @Query("select p from Product p where lower(p.name) like (concat('%',:keyword,'%') ) ")
-    Page<Product> searchByName(String name,
-                               Pageable pageable);
+    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :keyword, '%')) AND p.isDeleted = false")
+    Page<Product> searchByName(
+            @Param("keyword") String keyword,
+            Pageable pageable
+    );
+
+    java.util.Optional<Product> findByIdAndIsDeletedFalse(Long id);
 }

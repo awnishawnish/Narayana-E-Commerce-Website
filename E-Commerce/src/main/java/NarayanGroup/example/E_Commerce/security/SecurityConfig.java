@@ -36,7 +36,7 @@ public class SecurityConfig {
 
                         .requestMatchers("/api/user",
                                 "/api/user/**","/api/product",
-                                "/api/product/**","/login/**","/api/userId/cart","/api/userId/cart/**")
+                                "/api/product/**","/login/**","/api/userId/cart","/api/userId/cart/**","/api/checkout/**","/api/address/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

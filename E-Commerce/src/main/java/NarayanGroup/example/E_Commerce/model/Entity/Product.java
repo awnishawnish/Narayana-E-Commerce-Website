@@ -3,11 +3,12 @@ package NarayanGroup.example.E_Commerce.model.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal; // ✅ CHANGED: was Long, now supports decimal prices like ₹99.99
+import java.math.BigDecimal;
 
 @Entity
 @Table(name = "product")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -22,21 +23,29 @@ public class Product {
 
     @Column(name = "name")
     private String name;
+
     @Column(nullable = false)
     private String category;
 
-    // ✅ CHANGED: was `Long price` — BigDecimal supports decimal prices (₹99.99)
-    @Column(nullable = false)
+    @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal price;
 
-    // ✅ CHANGED: was `Long quantity` — Integer is sufficient for stock count
+    /**
+     * Kept temporarily for backward compatibility with
+     * the existing product/cart functionality.
+     *
+     * Inventory will become the source of truth for stock
+     * during checkout.
+     */
+    @Column
     private Integer quantity;
 
+    @Column(length = 10)
     private String currency;
 
     @Column(name = "image_key")
-    private String imageKey; // stores S3 URL / key for the product image
+    private String imageKey;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 }

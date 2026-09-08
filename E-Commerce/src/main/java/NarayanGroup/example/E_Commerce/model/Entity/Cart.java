@@ -5,11 +5,13 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "cart")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -19,19 +21,22 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * One User -> One Cart
-     */
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",
+    @JoinColumn(
+            name = "user_id",
             nullable = false,
-            unique = true)
+            unique = true
+    )
     private UserEntity user;
 
     @Column(name = "total_items")
     private Integer totalItems;
 
-    @Column(name = "total_amount")
+    @Column(
+            name = "total_amount",
+            precision = 19,
+            scale = 2
+    )
     private BigDecimal totalAmount;
 
     @Column(name = "created_at")
@@ -40,13 +45,14 @@ public class Cart {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "is_deleted")
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
+    @Builder.Default
     @OneToMany(
             mappedBy = "cart",
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
-    private List<CartItem> cartItems;
+    private List<CartItem> cartItems = new ArrayList<>();
 }

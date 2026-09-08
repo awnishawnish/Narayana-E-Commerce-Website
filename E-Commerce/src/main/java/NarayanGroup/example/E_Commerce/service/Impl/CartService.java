@@ -15,34 +15,40 @@ public class CartService implements ICartService {
     private final ICartRepository cartRepository;
     private final ICartItemRepository cartItemRepository;
 
-
     @Override
     public Cart findByUserid(Long userId) {
-        return cartRepository.findByUserId(userId);
-    }
 
+        return cartRepository
+                .findByUserIdAndIsDeletedFalse(userId)
+                .orElse(null);
+    }
 
     @Override
     public void addToCart(Cart cart) {
         cartRepository.save(cart);
     }
 
-
     @Override
     public CartItem getCartItemById(Long cartItemId) {
-        return cartItemRepository.findById(cartItemId)
+
+        return cartItemRepository
+                .findByIdAndIsDeletedFalse(cartItemId)
                 .orElse(null);
     }
-
 
     @Override
     public void saveCartItem(CartItem cartItem) {
         cartItemRepository.save(cartItem);
     }
 
-
     @Override
     public void deleteCartItem(CartItem cartItem) {
-        cartItemRepository.delete(cartItem);
+
+        /*
+         * Soft delete
+         */
+        cartItem.setDeleted(true);
+
+        cartItemRepository.save(cartItem);
     }
 }

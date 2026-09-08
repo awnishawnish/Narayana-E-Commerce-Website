@@ -13,10 +13,12 @@ import java.util.List;
 @Component
 @AllArgsConstructor
 public class CartTransformer {
+
     public static CartResponseDTO toCartResponseDTO(Cart cart) {
 
-        List<CartItemResponseDTO> itemDTOs = cart.getCartItems()
+      List<CartItemResponseDTO> CartItemResponseDTO= cart.getCartItems()
                 .stream()
+                .filter(item -> !item.isDeleted())
                 .map(CartTransformer::toCartItemResponseDTO)
                 .toList();
 
@@ -24,25 +26,27 @@ public class CartTransformer {
                 .cartId(cart.getId())
                 .totalItems(cart.getTotalItems())
                 .totalAmount(cart.getTotalAmount())
-                .items(itemDTOs)
+                .items(CartItemResponseDTO)
                 .build();
     }
 
-    private static CartItemResponseDTO toCartItemResponseDTO(CartItem item) {
+    private static CartItemResponseDTO toCartItemResponseDTO(
+            CartItem item) {
 
-        ProductSummaryDTO productDTO = ProductSummaryDTO.builder()
-                .productId(item.getProduct().getId())
-                .productName(item.getProduct().getTitle())
-                .category(item.getProduct().getCategory())
-                .price(item.getProduct().getPrice())
-                .imageKey(item.getProduct().getImageKey())
-                .build();
+        ProductSummaryDTO productDTO =
+                ProductSummaryDTO.builder()
+                        .productId(item.getProduct().getId())
+                        .productName(item.getProduct().getTitle())
+                        .category(item.getProduct().getCategory())
+                        .price(item.getProduct().getPrice())
+                        .imageKey(item.getProduct().getImageKey())
+                        .build();
 
         return CartItemResponseDTO.builder()
                 .cartItemId(item.getId())
                 .product(productDTO)
                 .quantity(item.getQuantity())
-                .priceAtAddition(item.getPrice_at_addition())
+                .priceAtAddition(item.getPriceAtAddition())
                 .currency(item.getCurrency())
                 .build();
     }

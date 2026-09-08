@@ -139,20 +139,6 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(message, status);
     }
 
-    @ExceptionHandler(CustomException.CartNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-
-    public ResponseEntity<ResponseMessageUtilityDTO> CartNotFoundException(NoResourceFoundException ex) {
-        ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
-                HttpStatus.NOT_FOUND.value(),
-                ex.getMessage(),
-                "MSID",
-                null
-        );
-        return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
-    }
 
     @ExceptionHandler(CustomException.ImageNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
@@ -295,4 +281,47 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(response);
     }
+
+    @ExceptionHandler({
+            CustomException.CartNotFoundException.class,
+            CustomException.AddressNotFoundException.class,
+            CustomException.InventoryNotFoundException.class,
+            CustomException.OrderNotFoundException.class
+    })
+    public ResponseEntity<ResponseMessageUtilityDTO>
+    handleNotFound(RuntimeException ex) {
+
+        ResponseMessageUtilityDTO response =
+                ResponseMessageUtilityDTO.builder()
+                        .status("FAILED")
+                        .httpStatus(HttpStatus.NOT_FOUND.value())
+                        .message(ex.getMessage())
+                        .msId("RESOURCE")
+                        .data(null)
+                        .build();
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(response);
+    }
+
+    @ExceptionHandler(CustomException.CheckoutException.class)
+    public ResponseEntity<ResponseMessageUtilityDTO>
+    handleCheckoutException(
+            CustomException.CheckoutException ex) {
+
+        ResponseMessageUtilityDTO response =
+                ResponseMessageUtilityDTO.builder()
+                        .status("FAILED")
+                        .httpStatus(HttpStatus.BAD_REQUEST.value())
+                        .message(ex.getMessage())
+                        .msId("CHECKOUT")
+                        .data(null)
+                        .build();
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
+    }
+
 }

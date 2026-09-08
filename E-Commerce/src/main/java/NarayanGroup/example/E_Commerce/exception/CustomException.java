@@ -75,5 +75,36 @@ public class CustomException extends RuntimeException {
         }
     }
 
+    public static class CheckoutException
+            extends RuntimeException {
+
+        public CheckoutException(String message) {
+            super(message);
+        }
+    }
+    public static class OrderNotFoundException
+            extends RuntimeException {
+
+        public OrderNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class AddressNotFoundException
+            extends RuntimeException {
+
+        public AddressNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InventoryNotFoundException
+            extends RuntimeException {
+
+        public InventoryNotFoundException(String message) {
+            super(message);
+        }
+    }
+    
 
 }

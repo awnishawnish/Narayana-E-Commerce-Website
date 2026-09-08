@@ -29,6 +29,7 @@ public class ProductService implements IProductService {
     private final IS3Service is3Service;
 
 
+
     @Override
     public Product addProduct(Product product) throws IOException {
         logger.info("Adding new product: {}", product.getTitle());
@@ -151,11 +152,21 @@ public class ProductService implements IProductService {
         return iProductRepository.searchByName(name, pageable);
     }
 
-   public Product getProductById(Long id){
-        return iProductRepository.findById(id).orElseThrow(() -> {
-            logger.error("Product not found with ID: {}", id);
-            return new CustomException.UserNotFoundException("Product not found with id: " + id);
-        });
+    @Override
+    public Product getProductById(Long id) {
+
+        return iProductRepository
+                .findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> {
+                    logger.error(
+                            "Product not found with ID: {}",
+                            id
+                    );
+
+                    return new CustomException.ProductNotFoundException(
+                            "Product not found with id: " + id
+                    );
+                });
     }
 
 }

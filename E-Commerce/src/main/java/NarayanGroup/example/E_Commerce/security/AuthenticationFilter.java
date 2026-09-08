@@ -43,6 +43,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 || pathMatcher.match("/api/product/**", path)
                 || pathMatcher.match("/api/user/**", path) || pathMatcher.match("/login/**", path)
                 || pathMatcher.match("/api/userId/cart/**", path)
+                || pathMatcher.match("/api/address/**", path)
+                || pathMatcher.match("/api/checkout/**", path)
 
         ) {
 

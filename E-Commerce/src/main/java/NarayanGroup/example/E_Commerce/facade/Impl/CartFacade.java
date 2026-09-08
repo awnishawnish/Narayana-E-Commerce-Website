@@ -115,7 +115,7 @@ class CartFacade implements ICartFacade {
                 cartItem.setCart(cart);
                 cartItem.setProduct(product);
                 cartItem.setQuantity(requestedQuantity);
-                cartItem.setPrice_at_addition(product.getPrice());
+                cartItem.setPriceAtAddition(product.getPrice());
                 cartItem.setCurrency(product.getCurrency());
 
                 cart.getCartItems().add(cartItem);
@@ -232,10 +232,11 @@ class CartFacade implements ICartFacade {
     // ============================================================
     // REMOVE CART ITEM
     // ============================================================
-
     @Transactional
     @Override
-    public ResponseMessageUtilityDTO removeItem(Long userId,Long cartItemId) {
+    public ResponseMessageUtilityDTO removeItem(
+            Long userId,
+            Long cartItemId) {
 
         CartItem cartItem =
                 cartService.getCartItemById(cartItemId);
@@ -246,28 +247,34 @@ class CartFacade implements ICartFacade {
             );
         }
 
-
-
         if (!cartItem.getCart()
                 .getUser()
                 .getId()
                 .equals(userId)) {
 
             throw new CustomException.UnauthorizedCartAccessException(
-                    "You are not authorized to modify this cart"
+                    "You are not authorized to modify this cart item"
             );
         }
 
         Cart cart = cartItem.getCart();
 
-        cart.getCartItems().remove(cartItem);
-
-        cartService.deleteCartItem(cartItem);
+        /*
+         * Soft delete.
+         *
+         * DO NOT remove it from cart.getCartItems()
+         * because orphanRemoval=true can physically delete it.
+         */
+        cartItem.setDeleted(true);
 
         calculateCartTotals(cart);
 
+        cartService.saveCartItem(cartItem);
         cartService.addToCart(cart);
-        CartResponseDTO responseDTO =  CartTransformer.toCartResponseDTO(cart);
+
+        CartResponseDTO responseDTO =
+                CartTransformer.toCartResponseDTO(cart);
+
         return ResponseMessageUtilityDTO.builder()
                 .status("Success")
                 .httpStatus(200)
@@ -275,7 +282,6 @@ class CartFacade implements ICartFacade {
                 .data(responseDTO)
                 .build();
     }
-
 
     // ============================================================
     // CLEAR CART
@@ -293,7 +299,8 @@ class CartFacade implements ICartFacade {
             );
         }
 
-        cart.getCartItems().clear();
+        cart.getCartItems()
+                .forEach(item -> item.setDeleted(true));
 
         cart.setTotalItems(0);
         cart.setTotalAmount(BigDecimal.ZERO);
@@ -317,13 +324,15 @@ class CartFacade implements ICartFacade {
 
         int totalItems = cart.getCartItems()
                 .stream()
+                .filter(item -> !item.isDeleted())
                 .mapToInt(CartItem::getQuantity)
                 .sum();
 
         BigDecimal totalAmount = cart.getCartItems()
                 .stream()
+                .filter(item -> !item.isDeleted())
                 .map(item ->
-                        item.getPrice_at_addition()
+                        item.getPriceAtAddition()
                                 .multiply(
                                         BigDecimal.valueOf(
                                                 item.getQuantity()
@@ -338,7 +347,6 @@ class CartFacade implements ICartFacade {
         cart.setTotalItems(totalItems);
         cart.setTotalAmount(totalAmount);
     }
-
 
     // ============================================================
     // GET LOGGED-IN USER ID

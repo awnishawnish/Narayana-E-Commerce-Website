@@ -6,10 +6,13 @@ import NarayanGroup.example.E_Commerce.DTO.response.ProductResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
 import NarayanGroup.example.E_Commerce.exception.CustomException;
 import NarayanGroup.example.E_Commerce.facade.IProductFacade;
+import NarayanGroup.example.E_Commerce.model.Entity.Inventory;
 import NarayanGroup.example.E_Commerce.model.Entity.Product;
 import NarayanGroup.example.E_Commerce.service.IProductService;
 import NarayanGroup.example.E_Commerce.service.IS3Service;
 import NarayanGroup.example.E_Commerce.service.IUserService;
+import NarayanGroup.example.E_Commerce.service.Impl.InventoryService;
+import NarayanGroup.example.E_Commerce.transformer.InventoryTransformer;
 import NarayanGroup.example.E_Commerce.transformer.ProductTransformer;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
@@ -35,6 +38,8 @@ public class ProductFacade implements IProductFacade {
     private final IProductService iProductService;
     private final ProductTransformer productTransformer;
     private final IS3Service is3Service;
+    private final InventoryService inventoryService;
+    private final InventoryTransformer inventoryTransformer;
 
     @Override
     public ResponseMessageUtilityDTO addProduct(MultipartFile image, ProductRequestDTO request) throws IOException {
@@ -42,6 +47,8 @@ public class ProductFacade implements IProductFacade {
         String imageKey = is3Service.uploadFile(image);
         Product product = productTransformer.toEntity(imageKey, request);
         Product savedProduct = iProductService.addProduct(product);
+        Inventory inventory = inventoryTransformer.toEntity(savedProduct, request);
+        inventoryService.save(inventory);
         logger.debug("Product added: {}", product);
         ProductResponseDTO productResponse = productTransformer.toResponseDTO(savedProduct);
         return ResponseMessageUtilityDTO.builder()
