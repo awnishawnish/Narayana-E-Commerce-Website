@@ -20,6 +20,9 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /*
+     * Internal payment identifier
+     */
     @Column(
             name = "payment_id",
             nullable = false,
@@ -28,12 +31,51 @@ public class Payment {
     )
     private String paymentId;
 
+    /*
+     * Our application's Order
+     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "order_id",
-            nullable = false
+            nullable = false,
+            unique = true
     )
     private Order order;
+
+    /*
+     * Razorpay Order ID
+     *
+     * Example:
+     * order_RZP123456789
+     */
+    @Column(
+            name = "gateway_order_id",
+            unique = true,
+            length = 100
+    )
+    private String gatewayOrderId;
+
+    /*
+     * Razorpay Payment ID
+     *
+     * Example:
+     * pay_ABC123456
+     */
+    @Column(
+            name = "gateway_payment_id",
+            unique = true,
+            length = 100
+    )
+    private String gatewayPaymentId;
+
+    /*
+     * Razorpay signature
+     */
+    @Column(
+            name = "gateway_signature",
+            length = 255
+    )
+    private String gatewaySignature;
 
     @Column(
             name = "amount",
@@ -64,9 +106,6 @@ public class Payment {
     )
     private String status;
 
-    @Column(name = "gateway_transaction_id")
-    private String gatewayTransactionId;
-
     @Column(
             name = "is_deleted",
             nullable = false
@@ -81,7 +120,6 @@ public class Payment {
 
     @PrePersist
     protected void onCreate() {
-
         LocalDateTime now = LocalDateTime.now();
 
         createdAt = now;
@@ -92,7 +130,6 @@ public class Payment {
 
     @PreUpdate
     protected void onUpdate() {
-
         updatedAt = LocalDateTime.now();
     }
 }

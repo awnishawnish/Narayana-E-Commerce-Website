@@ -6,14 +6,11 @@ import NarayanGroup.example.E_Commerce.model.Entity.UserEntity;
 import NarayanGroup.example.E_Commerce.model.Repositry.IUserRepository;
 import NarayanGroup.example.E_Commerce.service.IUserService;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import static NarayanGroup.example.E_Commerce.model.Entity.Role.USER;
+import static NarayanGroup.example.E_Commerce.model.Enum.Role.USER;
 
 @Service
 @AllArgsConstructor

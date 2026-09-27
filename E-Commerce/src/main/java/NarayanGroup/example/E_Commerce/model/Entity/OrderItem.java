@@ -34,6 +34,11 @@ public class OrderItem {
     private Product product;
 
     @Column(
+            name = "source_cart_item_id"
+    )
+    private Long sourceCartItemId;
+
+    @Column(
             name = "product_title",
             nullable = false
     )

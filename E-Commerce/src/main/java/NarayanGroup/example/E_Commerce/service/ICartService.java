@@ -14,4 +14,6 @@ public interface ICartService {
     void saveCartItem(CartItem cartItem);
 
     void deleteCartItem(CartItem cartItem);
+
+    void removeItem(Long userId, Long id);
 }

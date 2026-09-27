@@ -20,5 +20,12 @@ public interface IOrderRepository
             Long userId
     );
 
+    Optional<Order> findByIdAndIsDeletedFalse(Long orderId);
+
+    List<Order> findByStatusAndCreatedAtBeforeAndIsDeletedFalse(
+            NarayanGroup.example.E_Commerce.model.Enum.OrderStatus status,
+            java.time.LocalDateTime before
+    );
+
     boolean existsByOrderNumber(String orderNumber);
 }

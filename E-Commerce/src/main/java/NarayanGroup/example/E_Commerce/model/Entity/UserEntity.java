@@ -1,5 +1,6 @@
 package NarayanGroup.example.E_Commerce.model.Entity;
 
+import NarayanGroup.example.E_Commerce.model.Enum.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

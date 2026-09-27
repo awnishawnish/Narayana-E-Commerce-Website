@@ -18,6 +18,10 @@ public class CheckoutResponseDTO {
 
     private String orderNumber;
 
+    private String razorpayOrderId;
+
+    private String razorpayKeyId;
+
     private String status;
 
     private String paymentStatus;

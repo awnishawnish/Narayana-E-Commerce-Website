@@ -1,4 +1,4 @@
-package NarayanGroup.example.E_Commerce.model.Entity;
+package NarayanGroup.example.E_Commerce.model.Enum;
 
 
 public enum OrderStatus {

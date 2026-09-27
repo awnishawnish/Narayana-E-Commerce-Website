@@ -1,6 +1,7 @@
 package NarayanGroup.example.E_Commerce.model.Entity;
 
 
+import NarayanGroup.example.E_Commerce.model.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -21,13 +21,14 @@ public class AddressRequestDTO {
     @NotBlank(message = "Phone is required")
     @Pattern(
             regexp = "^[6-9]\\d{9}$",
-            message = "Invalid phone number"
+            message = "Phone number must be exactly 10 digits"
     )
     private String phone;
 
     @NotBlank(message = "Address line 1 is required")
     private String addressLine1;
 
+    // Optional
     private String addressLine2;
 
     @NotBlank(message = "City is required")
@@ -37,8 +38,12 @@ public class AddressRequestDTO {
     private String state;
 
     @NotBlank(message = "Pincode is required")
-    @Size(min = 6, max = 6, message = "Pincode must contain 6 digits")
+    @Pattern(
+            regexp = "^\\d{6}$",
+            message = "Pincode must contain exactly 6 digits"
+    )
     private String pincode;
 
+    // Optional
     private Boolean isDefault;
 }

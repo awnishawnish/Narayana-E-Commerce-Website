@@ -3,102 +3,261 @@ package NarayanGroup.example.E_Commerce.facade.Impl;
 import NarayanGroup.example.E_Commerce.DTO.request.CheckoutRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.CheckoutResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
+import NarayanGroup.example.E_Commerce.configuration.RazorpayConfig;
 import NarayanGroup.example.E_Commerce.exception.CustomException;
+import NarayanGroup.example.E_Commerce.kafka.event.OrderConfirmedEvent;
+import NarayanGroup.example.E_Commerce.kafka.event.PaymentItemEvent;
+import NarayanGroup.example.E_Commerce.kafka.producer.DomainEventProducer;
 import NarayanGroup.example.E_Commerce.facade.ICheckoutFacade;
 import NarayanGroup.example.E_Commerce.model.Entity.*;
+import NarayanGroup.example.E_Commerce.model.Enum.OrderStatus;
 import NarayanGroup.example.E_Commerce.model.Repositry.IOrderRepository;
 import NarayanGroup.example.E_Commerce.model.Repositry.IPaymentRepository;
-import NarayanGroup.example.E_Commerce.service.IAddressService;
-import NarayanGroup.example.E_Commerce.service.ICartService;
-import NarayanGroup.example.E_Commerce.service.IInventoryService;
-import NarayanGroup.example.E_Commerce.service.IUserService;
-import NarayanGroup.example.E_Commerce.service.IProductService;
+import NarayanGroup.example.E_Commerce.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
-public class CheckoutFacade
-        implements ICheckoutFacade {
-
+public class CheckoutFacade implements ICheckoutFacade {
     private final ICartService cartService;
     private final IAddressService addressService;
     private final IInventoryService inventoryService;
     private final IUserService userService;
     private final IProductService productService;
-
     private final IOrderRepository orderRepository;
     private final IPaymentRepository paymentRepository;
-
+    private final IRazorpayService razorpayService;
+    private final RazorpayConfig razorpayConfig;
+    private final DomainEventProducer eventProducer;
     @Override
     @Transactional
     public ResponseMessageUtilityDTO checkout(
             Long userId,
             CheckoutRequestDTO request) {
-
         UserEntity user =
                 userService.getUserById(userId);
+        if (request.getPaymentMethod() == null ||
+                request.getPaymentMethod().trim().isEmpty()) {
+            throw new CustomException.CheckoutException(
+                    "Payment method is required"
+            );
+        }
+        String paymentMethod =
+                request.getPaymentMethod()
+                        .trim()
+                        .toUpperCase();
+
+        if (!paymentMethod.equals("COD")
+                && !paymentMethod.equals("RAZORPAY")) {
+
+            throw new CustomException.CheckoutException(
+                    "Invalid payment method. " +
+                            "Supported methods are COD and RAZORPAY"
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * 3. GET USER CART
+         * ============================================================
+         */
 
         Cart cart =
                 cartService.findByUserid(userId);
 
         if (cart == null) {
+
             throw new CustomException.CartNotFoundException(
                     "Cart not found"
             );
         }
 
-        /*
-         * 3. Get active cart items
-         */
-        var cartItems = cart.getCartItems()
-                .stream()
-                .filter(item -> !item.isDeleted())
-                .toList();
 
-        if (cartItems.isEmpty()) {
+        /*
+         * ============================================================
+         * 4. GET ACTIVE CART ITEMS
+         * ============================================================
+         */
+
+        List<CartItem> activeCartItems =
+                cart.getCartItems()
+                        .stream()
+                        .filter(item -> !item.isDeleted())
+                        .collect(Collectors.toList());
+
+        if (activeCartItems.isEmpty()) {
 
             throw new CustomException.CheckoutException(
                     "Cart is empty"
             );
         }
 
+
         /*
-         * 4. Validate address
+         * ============================================================
+         * 5. SELECT ITEMS FOR CHECKOUT
+         * ============================================================
+         *
+         * If cartItemIds are provided:
+         *
+         *     Buy Now
+         *     Buy this now
+         *     Selected cart items
+         *
+         * Example:
+         *
+         *     [12]
+         *
+         * If cartItemIds are null/empty:
+         *
+         *     Checkout entire cart
          */
+
+        List<Long> requestedCartItemIds =
+                request.getCartItemIds();
+
+        List<CartItem> checkoutItems;
+
+
+        if (requestedCartItemIds == null
+                || requestedCartItemIds.isEmpty()) {
+
+            /*
+             * Checkout complete cart
+             */
+
+            checkoutItems = activeCartItems;
+
+        } else {
+
+            /*
+             * Convert requested IDs into Set
+             */
+
+            Set<Long> requestedIds =
+                    new HashSet<>(requestedCartItemIds);
+
+
+            /*
+             * Get IDs of active cart items
+             */
+
+            Set<Long> activeCartItemIds =
+                    activeCartItems
+                            .stream()
+                            .map(CartItem::getId)
+                            .collect(Collectors.toSet());
+
+
+            /*
+             * Make sure every requested cart item
+             * actually belongs to this user's cart.
+             */
+
+            if (!activeCartItemIds.containsAll(requestedIds)) {
+
+                throw new CustomException.CheckoutException(
+                        "One or more selected cart items are invalid"
+                );
+            }
+
+
+            /*
+             * Select requested items only
+             */
+
+            checkoutItems =
+                    activeCartItems
+                            .stream()
+                            .filter(item ->
+                                    requestedIds.contains(item.getId()))
+                            .collect(Collectors.toList());
+        }
+
+
+        if (checkoutItems.isEmpty()) {
+
+            throw new CustomException.CheckoutException(
+                    "No items selected for checkout"
+            );
+        }
+
+
+        /*
+         * ============================================================
+         * 6. VALIDATE ADDRESS
+         * ============================================================
+         */
+
         Address address =
                 addressService.findActiveAddress(
                         request.getAddressId(),
                         userId
                 );
 
+
         /*
-         * 5. Calculate current prices
+         * ============================================================
+         * 7. CALCULATE PRICE FROM DATABASE
+         * ============================================================
          *
-         * IMPORTANT:
-         * Do not blindly trust priceAtAddition.
+         * NEVER trust frontend price.
          *
-         * Checkout should use the CURRENT product price.
+         * Product price is always taken from database.
          */
+
         BigDecimal subtotal =
                 BigDecimal.ZERO;
 
         String currency = null;
 
-        for (CartItem cartItem : cartItems) {
+
+        for (CartItem cartItem : checkoutItems) {
 
             Product product =
                     productService.getProductById(
                             cartItem.getProduct().getId()
                     );
 
+
+            /*
+             * First product decides currency
+             */
+
             if (currency == null) {
+
                 currency = product.getCurrency();
             }
+
+
+            /*
+             * Make sure all products have same currency
+             */
+
+            if (!currency.equals(product.getCurrency())) {
+
+                throw new CustomException.CheckoutException(
+                        "Products with different currencies " +
+                                "cannot be checked out together"
+                );
+            }
+
+
+            /*
+             * Calculate item total
+             */
 
             BigDecimal itemTotal =
                     product.getPrice()
@@ -108,8 +267,14 @@ public class CheckoutFacade
                                     )
                             );
 
+
             subtotal =
                     subtotal.add(itemTotal);
+
+
+            /*
+             * Reserve inventory
+             */
 
             inventoryService.reserveStock(
                     product.getId(),
@@ -117,14 +282,30 @@ public class CheckoutFacade
             );
         }
 
+
         /*
-         * 7. Calculate charges
+         * ============================================================
+         * 8. CALCULATE CHARGES
+         * ============================================================
          *
-         * Basic version:
+         * Currently:
+         *
+         * Tax       = 0
+         * Delivery  = 0
+         * Discount  = 0
+         *
+         * You can make these dynamic later.
          */
-        BigDecimal tax = BigDecimal.ZERO;
-        BigDecimal deliveryCharge = BigDecimal.ZERO;
-        BigDecimal discount = BigDecimal.ZERO;
+
+        BigDecimal tax =
+                BigDecimal.ZERO;
+
+        BigDecimal deliveryCharge =
+                BigDecimal.ZERO;
+
+        BigDecimal discount =
+                BigDecimal.ZERO;
+
 
         BigDecimal totalAmount =
                 subtotal
@@ -132,40 +313,117 @@ public class CheckoutFacade
                         .add(deliveryCharge)
                         .subtract(discount);
 
-        /*
-         * 8. Create order
-         */
-        Order order = Order.builder()
-                .orderNumber(generateOrderNumber())
-                .user(user)
-                .status(OrderStatus.PENDING_PAYMENT)
-                .paymentStatus("PENDING")
-                .paymentMethod(request.getPaymentMethod())
-                .subtotal(subtotal)
-                .tax(tax)
-                .deliveryCharge(deliveryCharge)
-                .discount(discount)
-                .totalAmount(totalAmount)
-                .currency(currency)
-                .shippingFullName(address.getFullName())
-                .shippingPhone(address.getPhone())
-                .shippingAddressLine1(address.getAddressLine1())
-                .shippingAddressLine2(address.getAddressLine2())
-                .shippingCity(address.getCity())
-                .shippingState(address.getState())
-                .shippingPincode(address.getPincode())
-                .isDeleted(false)
-                .build();
 
         /*
-         * 9. Create order items
+         * ============================================================
+         * 9. DETERMINE INITIAL ORDER STATUS
+         * ============================================================
+         *
+         * COD:
+         *
+         *     CONFIRMED
+         *
+         * Razorpay:
+         *
+         *     PENDING_PAYMENT
          */
-        for (CartItem cartItem : cartItems) {
+
+        OrderStatus initialOrderStatus;
+
+
+        if ("COD".equals(paymentMethod)) {
+
+            initialOrderStatus =
+                    OrderStatus.CONFIRMED;
+
+        } else {
+
+            initialOrderStatus =
+                    OrderStatus.PENDING_PAYMENT;
+        }
+
+
+        /*
+         * ============================================================
+         * 10. CREATE LOCAL ORDER
+         * ============================================================
+         */
+
+        Order order =
+                Order.builder()
+                        .orderNumber(
+                                generateOrderNumber()
+                        )
+                        .user(user)
+
+                        .status(initialOrderStatus)
+
+                        /*
+                         * COD payment will be collected later.
+                         *
+                         * Razorpay payment is also initially pending.
+                         */
+                        .paymentStatus("PENDING")
+
+                        .paymentMethod(paymentMethod)
+
+                        .subtotal(subtotal)
+                        .tax(tax)
+                        .deliveryCharge(deliveryCharge)
+                        .discount(discount)
+                        .totalAmount(totalAmount)
+                        .currency(currency)
+
+                        /*
+                         * Shipping address snapshot
+                         */
+
+                        .shippingFullName(
+                                address.getFullName()
+                        )
+
+                        .shippingPhone(
+                                address.getPhone()
+                        )
+
+                        .shippingAddressLine1(
+                                address.getAddressLine1()
+                        )
+
+                        .shippingAddressLine2(
+                                address.getAddressLine2()
+                        )
+
+                        .shippingCity(
+                                address.getCity()
+                        )
+
+                        .shippingState(
+                                address.getState()
+                        )
+
+                        .shippingPincode(
+                                address.getPincode()
+                        )
+
+                        .isDeleted(false)
+
+                        .build();
+
+
+        /*
+         * ============================================================
+         * 11. CREATE ORDER ITEMS
+         * ============================================================
+         */
+
+        for (CartItem cartItem : checkoutItems) {
 
             Product product =
                     productService.getProductById(
                             cartItem.getProduct().getId()
                     );
+
 
             BigDecimal itemTotal =
                     product.getPrice()
@@ -175,98 +433,304 @@ public class CheckoutFacade
                                     )
                             );
 
+
             OrderItem orderItem =
                     OrderItem.builder()
+
                             .order(order)
+
+                            .sourceCartItemId(cartItem.getId())
+
                             .product(product)
-                            .productTitle(product.getTitle())
+
+                            .productTitle(
+                                    product.getTitle()
+                            )
+
                             .quantity(
                                     cartItem.getQuantity()
                                             .longValue()
                             )
-                            .unitPrice(product.getPrice())
+
+                            .unitPrice(
+                                    product.getPrice()
+                            )
+
                             .totalPrice(itemTotal)
-                            .currency(product.getCurrency())
+
+                            .currency(
+                                    product.getCurrency()
+                            )
+
                             .isDeleted(false)
+
                             .build();
 
-            order.getOrderItems().add(orderItem);
+
+            order.getOrderItems()
+                    .add(orderItem);
         }
+
+
+        /*
+         * ============================================================
+         * 12. SAVE LOCAL ORDER
+         * ============================================================
+         */
 
         Order savedOrder =
                 orderRepository.save(order);
 
+
         /*
-         * 10. Create payment record
+         * ============================================================
+         * 13. CREATE RAZORPAY ORDER ONLY FOR RAZORPAY
+         * ============================================================
          *
-         * Actual payment gateway will be implemented later.
+         * COD:
+         *
+         *     No Razorpay order
+         *
+         * RAZORPAY:
+         *
+         *     Create Razorpay order
          */
+
+        String razorpayOrderId = null;
+
+
+        if ("RAZORPAY".equals(paymentMethod)) {
+
+            try {
+
+                razorpayOrderId =
+                        razorpayService.createOrder(
+                                totalAmount,
+                                currency,
+                                savedOrder.getOrderNumber()
+                        );
+
+            } catch (Exception e) {
+
+                throw new CustomException.CheckoutException(
+                        "Unable to create Razorpay order"
+                );
+            }
+        }
+
+
+        /*
+         * ============================================================
+         * 14. CREATE PAYMENT RECORD
+         * ============================================================
+         *
+         * COD:
+         *
+         *     gatewayOrderId = null
+         *     status = PENDING
+         *
+         * RAZORPAY:
+         *
+         *     gatewayOrderId = Razorpay order ID
+         *     status = PENDING
+         */
+
         Payment payment =
                 Payment.builder()
+
                         .paymentId(
                                 "PAY-" +
                                         UUID.randomUUID()
                                                 .toString()
                                                 .replace("-", "")
                         )
+
                         .order(savedOrder)
-                        .amount(totalAmount)
-                        .currency(currency)
-                        .paymentMethod(
-                                request.getPaymentMethod()
+
+                        .gatewayOrderId(
+                                razorpayOrderId
                         )
-                        .status("PENDING")
+
+                        .amount(
+                                totalAmount
+                        )
+
+                        .currency(
+                                currency
+                        )
+
+                        .paymentMethod(
+                                paymentMethod
+                        )
+
+                        .status(
+                                "PENDING"
+                        )
+
                         .isDeleted(false)
+
                         .build();
+
 
         paymentRepository.save(payment);
 
+
         /*
-         * 11. Clear active cart items
+         * ============================================================
+         * 15. COD PROCESSING
+         * ============================================================
          *
-         * We use soft delete.
+         * COD order is already confirmed.
+         *
+         * Therefore remove the purchased cart items.
+         *
+         * IMPORTANT:
+         *
+         * We remove only checkoutItems,
+         * not the complete cart.
          */
-        cartItems.forEach(item ->
-                item.setDeleted(true)
-        );
 
-        cart.setTotalItems(0);
-        cart.setTotalAmount(BigDecimal.ZERO);
+        if ("COD".equals(paymentMethod)) {
+
+            for (CartItem cartItem : checkoutItems) {
+
+                cartService.removeItem(
+                        userId,
+                        cartItem.getId()
+                );
+            }
+
+            OrderConfirmedEvent orderConfirmedEvent = OrderConfirmedEvent.builder()
+                            .eventId(UUID.randomUUID().toString())
+                            .orderId(savedOrder.getId())
+                            .orderNumber(savedOrder.getOrderNumber())
+                            .paymentMethod(paymentMethod)
+                            .amount(savedOrder.getTotalAmount())
+                            .currency(savedOrder.getCurrency())
+                            .userId(user.getId())
+                            .userEmail(user.getEmail())
+                            .items(checkoutItems.stream()
+                                    .map(item -> PaymentItemEvent.builder()
+                                            .productId(item.getProduct().getId())
+                                            .quantity(item.getQuantity().longValue())
+                                            .build())
+                                    .collect(Collectors.toList()))
+                            .build();
+            publishAfterCommit(() -> eventProducer.publishOrderConfirmed(orderConfirmedEvent));
+        }
+
 
         /*
-         * Cart is managed inside transaction,
-         * so changes will be persisted.
+         * ============================================================
+         * 16. PREPARE RESPONSE
+         * ============================================================
+         *
+         * COD:
+         *
+         *     razorpayOrderId = null
+         *     razorpayKeyId = null
+         *
+         * RAZORPAY:
+         *
+         *     razorpayOrderId = actual Razorpay order
+         *     razorpayKeyId = public Razorpay key
          */
 
         CheckoutResponseDTO response =
                 CheckoutResponseDTO.builder()
-                        .orderId(savedOrder.getId())
+
+                        .orderId(
+                                savedOrder.getId()
+                        )
+
                         .orderNumber(
                                 savedOrder.getOrderNumber()
                         )
+
+                        .razorpayOrderId(
+                                razorpayOrderId
+                        )
+
+                        .razorpayKeyId(
+                                "RAZORPAY".equals(paymentMethod)
+                                        ? razorpayConfig.getKeyId()
+                                        : null
+                        )
+
                         .status(
-                                savedOrder.getStatus().name()
+                                savedOrder
+                                        .getStatus()
+                                        .name()
                         )
+
                         .paymentStatus(
-                                savedOrder.getPaymentStatus()
+                                savedOrder
+                                        .getPaymentStatus()
                         )
+
                         .totalAmount(
                                 savedOrder.getTotalAmount()
                         )
+
                         .currency(
                                 savedOrder.getCurrency()
                         )
+
                         .build();
 
+
+        /*
+         * ============================================================
+         * 17. RETURN RESPONSE
+         * ============================================================
+         */
+
+        String message;
+
+        if ("COD".equals(paymentMethod)) {
+
+            message =
+                    "Order placed successfully";
+
+        } else {
+
+            message =
+                    "Checkout initiated successfully";
+        }
+
+
         return ResponseMessageUtilityDTO.builder()
+
                 .status("Success")
+
                 .httpStatus(201)
-                .message(
-                        "Checkout initiated successfully"
-                )
+
+                .message(message)
+
                 .data(response)
+
                 .build();
     }
+
+
+    private void publishAfterCommit(Runnable action) {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    action.run();
+                }
+            });
+        } else {
+            action.run();
+        }
+    }
+
+    /*
+     * ================================================================
+     * GENERATE ORDER NUMBER
+     * ================================================================
+     */
 
     private String generateOrderNumber() {
 

@@ -5,42 +5,65 @@ import NarayanGroup.example.E_Commerce.DTO.response.CartResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ProductSummaryDTO;
 import NarayanGroup.example.E_Commerce.model.Entity.Cart;
 import NarayanGroup.example.E_Commerce.model.Entity.CartItem;
+import NarayanGroup.example.E_Commerce.service.IS3Service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
 public class CartTransformer {
 
-    public static CartResponseDTO toCartResponseDTO(Cart cart) {
+    private final IS3Service s3Service;
 
-      List<CartItemResponseDTO> CartItemResponseDTO= cart.getCartItems()
-                .stream()
-                .filter(item -> !item.isDeleted())
-                .map(CartTransformer::toCartItemResponseDTO)
-                .toList();
+    public CartResponseDTO toCartResponseDTO(Cart cart) {
 
         return CartResponseDTO.builder()
                 .cartId(cart.getId())
-                .totalItems(cart.getTotalItems())
+                .totalItems(
+                        cart.getCartItems()
+                                .stream()
+                                .filter(item -> !item.isDeleted())
+                                .mapToInt(CartItem::getQuantity)
+                                .sum()
+                )
                 .totalAmount(cart.getTotalAmount())
-                .items(CartItemResponseDTO)
+                .items(
+                        cart.getCartItems()
+                                .stream()
+                                .filter(item -> !item.isDeleted())
+                                .map(this::toCartItemResponseDTO)
+                                .collect(Collectors.toList())
+                )
                 .build();
     }
 
-    private static CartItemResponseDTO toCartItemResponseDTO(
+
+    private  CartItemResponseDTO toCartItemResponseDTO(
             CartItem item) {
 
         ProductSummaryDTO productDTO =
                 ProductSummaryDTO.builder()
-                        .productId(item.getProduct().getId())
-                        .productName(item.getProduct().getTitle())
-                        .category(item.getProduct().getCategory())
-                        .price(item.getProduct().getPrice())
-                        .imageKey(item.getProduct().getImageKey())
+                        .productId(
+                                item.getProduct().getId()
+                        )
+                        .productName(
+                                item.getProduct().getTitle()
+                        )
+                        .category(
+                                item.getProduct().getCategory()
+                        )
+                        .price(
+                                item.getProduct().getPrice()
+                        )
+                        .imageKey(
+                                s3Service.getImageUrl(
+                                        item.getProduct().getImageKey()
+                                )
+                        )
                         .build();
+
 
         return CartItemResponseDTO.builder()
                 .cartItemId(item.getId())

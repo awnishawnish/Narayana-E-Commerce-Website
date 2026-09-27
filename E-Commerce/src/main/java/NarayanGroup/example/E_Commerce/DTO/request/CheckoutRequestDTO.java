@@ -7,16 +7,17 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class CheckoutRequestDTO {
 
-    @NotNull(message = "Address id is required")
-    @Positive(message = "Address id must be positive")
     private Long addressId;
 
-    @NotNull(message = "Payment method is required")
     private String paymentMethod;
+
+    private List<Long> cartItemIds;
 }
