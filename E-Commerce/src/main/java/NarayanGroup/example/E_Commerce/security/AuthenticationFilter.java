@@ -2,7 +2,6 @@ package NarayanGroup.example.E_Commerce.security;
 
 import NarayanGroup.example.E_Commerce.service.Impl.LoginService;
 import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,7 +9,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -83,7 +83,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
             response.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED,
-                    "Invalid token"
+                    ErrorConstants.TOKEN_INVALID
             );
 
             return;
@@ -121,7 +121,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
                     response.sendError(
                             HttpServletResponse.SC_UNAUTHORIZED,
-                            "Token expired or invalid"
+                            ErrorConstants.TOKEN_EXPIRED_OR_INVALID
                     );
 
                     return;
@@ -131,7 +131,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
                 response.sendError(
                         HttpServletResponse.SC_UNAUTHORIZED,
-                        "User not found"
+                        ErrorConstants.USER_NOT_FOUND
                 );
 
                 return;

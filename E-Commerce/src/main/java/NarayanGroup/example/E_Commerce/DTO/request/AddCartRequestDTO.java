@@ -1,9 +1,8 @@
 package NarayanGroup.example.E_Commerce.DTO.request;
 
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddCartRequestDTO {
-    @NotEmpty(message = "Products list cannot be empty")
+    @NotEmpty(message = ErrorConstants.PRODUCTS_LIST_EMPTY)
     @Valid
     private List<AddCartItemRequestDTO> products;
 }

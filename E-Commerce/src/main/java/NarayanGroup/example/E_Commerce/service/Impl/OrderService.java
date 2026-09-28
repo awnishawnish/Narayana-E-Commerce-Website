@@ -24,7 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -62,27 +63,27 @@ public class OrderService implements IOrderService {
         Order order = findOrder(userId, orderId);
         if (order.getStatus() == OrderStatus.CANCELLED) return;
         if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
-            throw new CustomException.CheckoutException("This order can no longer be cancelled");
+            throw new CustomException.CheckoutException(ErrorConstants.ORDER_CANNOT_BE_CANCELLED);
         }
 
         Payment payment = paymentRepository.findByOrderIdAndIsDeletedFalse(orderId)
-                .orElseThrow(() -> new CustomException.CheckoutException("Payment not found"));
-        boolean paid = "SUCCESS".equalsIgnoreCase(payment.getStatus());
+                .orElseThrow(() -> new CustomException.CheckoutException(ErrorConstants.PAYMENT_NOT_FOUND));
+        boolean paid = CommonConstants.PAYMENT_STATUS_SUCCESS.equalsIgnoreCase(payment.getStatus());
 
-        if (paid && "RAZORPAY".equalsIgnoreCase(payment.getPaymentMethod())) {
+        if (paid && CommonConstants.RAZORPAY.equalsIgnoreCase(payment.getPaymentMethod())) {
             try {
                 razorpayService.refundPayment(payment.getGatewayPaymentId(), payment.getAmount(), payment.getCurrency());
             } catch (Exception ex) {
-                throw new CustomException.CheckoutException("Unable to start the Razorpay refund. Order was not cancelled.");
+                throw new CustomException.CheckoutException(ErrorConstants.REFUND_FAILED);
             }
-            payment.setStatus("REFUNDED");
-            order.setPaymentStatus("REFUNDED");
+            payment.setStatus(CommonConstants.PAYMENT_STATUS_REFUNDED);
+            order.setPaymentStatus(CommonConstants.PAYMENT_STATUS_REFUNDED);
         } else if (!paid) {
             payment.setStatus("CANCELLED");
             order.setPaymentStatus("CANCELLED");
         } else {
-            payment.setStatus("REFUNDED");
-            order.setPaymentStatus("REFUNDED");
+            payment.setStatus(CommonConstants.PAYMENT_STATUS_REFUNDED);
+            order.setPaymentStatus(CommonConstants.PAYMENT_STATUS_REFUNDED);
         }
 
         order.setStatus(OrderStatus.CANCELLED);
@@ -163,7 +164,7 @@ public class OrderService implements IOrderService {
             document.save(output);
             return output.toByteArray();
         } catch (Exception ex) {
-            throw new CustomException.CheckoutException("Unable to generate invoice PDF");
+            throw new CustomException.CheckoutException(ErrorConstants.INVOICE_GENERATION_FAILED);
         }
     }
 
@@ -173,12 +174,12 @@ public class OrderService implements IOrderService {
         Order order = orderRepository.findByIdAndIsDeletedFalse(orderId).orElse(null);
         if (order == null || order.getStatus() != OrderStatus.PENDING_PAYMENT) return;
         if (order.getCreatedAt() == null || order.getCreatedAt().plusMinutes(paymentTimeoutMinutes).isAfter(LocalDateTime.now())) return;
-        cancelOrder(order.getUser().getId(), order.getId(), "Payment window expired");
+        cancelOrder(order.getUser().getId(), order.getId(), ErrorConstants.PAYMENT_WINDOW_EXPIRED);
     }
 
     private Order findOrder(Long userId, Long orderId) {
         return orderRepository.findByIdAndUserIdAndIsDeletedFalse(orderId, userId)
-                .orElseThrow(() -> new CustomException.OrderNotFoundException("Order not found"));
+                .orElseThrow(() -> new CustomException.OrderNotFoundException(ErrorConstants.ORDER_NOT_FOUND));
     }
 
     private OrderResponseDTO toDTO(Order order) {

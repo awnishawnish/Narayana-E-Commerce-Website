@@ -10,7 +10,8 @@ import NarayanGroup.example.E_Commerce.model.Entity.Inventory;
 import NarayanGroup.example.E_Commerce.model.Entity.Product;
 import NarayanGroup.example.E_Commerce.service.IProductService;
 import NarayanGroup.example.E_Commerce.service.IS3Service;
-import NarayanGroup.example.E_Commerce.service.IUserService;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import NarayanGroup.example.E_Commerce.service.Impl.InventoryService;
 import NarayanGroup.example.E_Commerce.transformer.InventoryTransformer;
 import NarayanGroup.example.E_Commerce.transformer.ProductTransformer;
@@ -23,10 +24,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -52,9 +51,9 @@ public class ProductFacade implements IProductFacade {
         logger.debug("Product added: {}", product);
         ProductResponseDTO productResponse = productTransformer.toResponseDTO(savedProduct);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(201)
-                .message("Product added successfully")
+                .message(CommonConstants.PRODUCT_ADDED_SUCCESSFULLY)
                 .data(productResponse)
                 .build();
     }
@@ -75,7 +74,7 @@ public class ProductFacade implements IProductFacade {
                         }
                         return productTransformer.toEntity(imageKey, request);
                     } else {
-                        throw new CustomException.ImageNotFoundException("Image not found for product: " + request.getTitle());
+                        throw new CustomException.ImageNotFoundException(ErrorConstants.IMAGE_NOT_FOUND_FOR_PRODUCT + request.getTitle());
                     }
                 })
                 .collect(Collectors.toList());
@@ -85,9 +84,9 @@ public class ProductFacade implements IProductFacade {
                 .collect(Collectors.toList());
         logger.debug("Bulk products added: {}", products.size());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(201)
-                .message(products.size() + " products added successfully")
+                .message(String.format(CommonConstants.PRODUCTS_ADDED_SUCCESSFULLY, products.size()))
                 .data(productResponses)
                 .build();
     }
@@ -101,9 +100,9 @@ public class ProductFacade implements IProductFacade {
                 .collect(Collectors.toList());
         logger.debug("Fetched {} products", products.getTotalElements());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Products fetched successfully")
+                .message(CommonConstants.PRODUCTS_FETCHED_SUCCESSFULLY)
                 .data(productResponses)
                 .build();
     }
@@ -117,9 +116,9 @@ public class ProductFacade implements IProductFacade {
                 .collect(Collectors.toList());
         logger.debug("Search returned {} products", products.getTotalElements());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Search results for: " + keyword)
+                .message(String.format(CommonConstants.SEARCH_RESULTS_FOR, keyword))
                 .data(productResponses)
                 .build();
     }
@@ -130,9 +129,9 @@ public class ProductFacade implements IProductFacade {
         Product product = iProductService.findProduct(id);
         logger.debug("Fetched product: {}", product);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Product fetched successfully")
+                .message(CommonConstants.PRODUCT_FETCHED_SUCCESSFULLY)
                 .data(productTransformer.toResponseDTO(product))
                 .build();
     }
@@ -143,9 +142,9 @@ public class ProductFacade implements IProductFacade {
         iProductService.deleteProduct(id);
         logger.info("Product deleted successfully, ID: {}", id);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Product deleted successfully")
+                .message(CommonConstants.PRODUCT_DELETED_SUCCESSFULLY)
                 .build();
     }
 
@@ -155,9 +154,9 @@ public class ProductFacade implements IProductFacade {
         Product product = iProductService.adjustQuantity(id, delta);
         logger.debug("Quantity updated for product ID: {}, new quantity: {}", id, product.getQuantity());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Quantity updated. New quantity: " + product.getQuantity())
+                .message(String.format(CommonConstants.QUANTITY_UPDATED, product.getQuantity()))
                 .data(productTransformer.toResponseDTO(product))
                 .build();
     }
@@ -168,9 +167,9 @@ public class ProductFacade implements IProductFacade {
         Product product = iProductService.updateProduct(id, request);
         logger.debug("Product updated: {}", product);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Product updated successfully")
+                .message(CommonConstants.PRODUCT_UPDATED_SUCCESSFULLY)
                 .data(productTransformer.toResponseDTO(product))
                 .build();
     }
@@ -183,8 +182,8 @@ public class ProductFacade implements IProductFacade {
                 .map(productTransformer::toResponseDTO)
                 .collect(Collectors.toList());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
-                .message("Products fetched successfully")
+                .status(CommonConstants.SUCCESS)
+                .message(CommonConstants.PRODUCTS_FETCHED_SUCCESSFULLY)
                 .data(productResponses)
                 .build();
     }

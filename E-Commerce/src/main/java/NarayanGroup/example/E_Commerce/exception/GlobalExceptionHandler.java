@@ -1,6 +1,8 @@
 package NarayanGroup.example.E_Commerce.exception;
 
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,10 +32,10 @@ public class GlobalExceptionHandler {
                 .toList();
 
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation failed",
-                "MSID",
+                ErrorConstants.VALIDATION_FAILED,
+                CommonConstants.MS_ID,
                 buildErrorPayload(errors)
         );
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
@@ -49,10 +51,10 @@ public class GlobalExceptionHandler {
                 .toList();
 
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.BAD_REQUEST.value(),
-                "Validation failed",
-                "MSID",
+                ErrorConstants.VALIDATION_FAILED,
+                CommonConstants.MS_ID,
                 buildErrorPayload(errors)
         );
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
@@ -63,10 +65,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<ResponseMessageUtilityDTO> handleIllegalArgumentException(IllegalArgumentException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.BAD_REQUEST.value(),
                 ex.getMessage(),
-                "MSID",
+                CommonConstants.MS_ID,
                 null
         );
         return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
@@ -77,10 +79,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<ResponseMessageUtilityDTO> handleNoResourceFoundException(NoResourceFoundException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
-                "MSID",
+                CommonConstants.MS_ID,
                 null
         );
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
@@ -91,10 +93,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<ResponseMessageUtilityDTO> handleAllExceptions(Exception ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "An unexpected error occurred: " + ex.getMessage(),
-                "MSID",
+                ErrorConstants.UNEXPECTED_ERROR + ex.getMessage(),
+                CommonConstants.MS_ID,
                 null
         );
         return new ResponseEntity<>(message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -106,7 +108,7 @@ public class GlobalExceptionHandler {
 
     private Map<String, Object> buildErrorPayload(List<String> errors) {
         Map<String, Object> payload = new LinkedHashMap<>();
-        payload.put("errors", errors);
+        payload.put(CommonConstants.ERROR_PAYLOAD_KEY, errors);
         return payload;
     }
 
@@ -129,10 +131,10 @@ public class GlobalExceptionHandler {
         }
 
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 status.value(),
                 ex.getMessage(),
-                "MSID",
+                CommonConstants.MS_ID,
                 null
         );
 
@@ -145,10 +147,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<ResponseMessageUtilityDTO> ImageNotFoundException(NoResourceFoundException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
-                "MSID",
+                CommonConstants.MS_ID,
                 null
         );
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
@@ -159,10 +161,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public ResponseEntity<ResponseMessageUtilityDTO> ProductNotFoundException(NoResourceFoundException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
-                "FAIL",
+                CommonConstants.FAIL,
                 HttpStatus.NOT_FOUND.value(),
                 ex.getMessage(),
-                "MSID",
+                CommonConstants.MS_ID,
                 null
         );
         return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
@@ -174,7 +176,7 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.CONFLICT.value())
                         .message(ex.getMessage())
                         .build();
@@ -190,7 +192,7 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .message(ex.getMessage())
                         .build();
@@ -206,10 +208,10 @@ public class GlobalExceptionHandler {
 //
 //        ResponseMessageUtilityDTO response =
 //                ResponseMessageUtilityDTO.builder()
-//                        .status("FAILED")
+//                        .status(CommonConstants.FAIL)
 //                        .httpStatus(HttpStatus.NOT_FOUND.value())
 //                        .message(ex.getMessage())
-//                        .msId("CART")
+//                        .msId(CommonConstants.CART)
 //                        .data(null)
 //                        .build();
 //
@@ -229,10 +231,10 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.NOT_FOUND.value())
                         .message(ex.getMessage())
-                        .msId("CART")
+                        .msId(CommonConstants.CART)
                         .data(null)
                         .build();
 
@@ -247,10 +249,10 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.FORBIDDEN.value())
                         .message(ex.getMessage())
-                        .msId("CART")
+                        .msId(CommonConstants.CART)
                         .data(null)
                         .build();
 
@@ -270,10 +272,10 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.UNAUTHORIZED.value())
                         .message(ex.getMessage())
-                        .msId("AUTH")
+                        .msId(CommonConstants.AUTH)
                         .data(null)
                         .build();
 
@@ -293,10 +295,10 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.NOT_FOUND.value())
                         .message(ex.getMessage())
-                        .msId("RESOURCE")
+                        .msId(CommonConstants.RESOURCE)
                         .data(null)
                         .build();
 
@@ -312,10 +314,10 @@ public class GlobalExceptionHandler {
 
         ResponseMessageUtilityDTO response =
                 ResponseMessageUtilityDTO.builder()
-                        .status("FAILED")
+                        .status(CommonConstants.FAIL)
                         .httpStatus(HttpStatus.BAD_REQUEST.value())
                         .message(ex.getMessage())
-                        .msId("CHECKOUT")
+                        .msId(CommonConstants.CHECKOUT)
                         .data(null)
                         .build();
 

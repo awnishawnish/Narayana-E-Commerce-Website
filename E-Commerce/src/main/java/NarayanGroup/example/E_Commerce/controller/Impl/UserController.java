@@ -12,7 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.RestController;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @RestController
 @AllArgsConstructor
 public class UserController implements IUserController {
@@ -85,6 +86,6 @@ public class UserController implements IUserController {
 
     public ResponseEntity<String> loginFailure() {
         logger.error("Login failed for user");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed!");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorConstants.LOGIN_FAILED);
     }
 }

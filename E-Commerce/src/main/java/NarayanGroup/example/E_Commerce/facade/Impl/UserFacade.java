@@ -3,6 +3,8 @@ package NarayanGroup.example.E_Commerce.facade.Impl;
 import NarayanGroup.example.E_Commerce.DTO.request.ResetPasswordRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.request.UserRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import NarayanGroup.example.E_Commerce.facade.IUserFacade;
 import NarayanGroup.example.E_Commerce.model.Entity.UserEntity;
 import NarayanGroup.example.E_Commerce.service.IUserService;
@@ -10,7 +12,8 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.util.List;
 
 @Component
@@ -25,9 +28,9 @@ public class UserFacade implements IUserFacade {
         UserEntity userEntity = iUserService.saveUserDetails(userRequestDTO);
         logger.debug("User saved: {}", userEntity);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(201)
-                .message("User registered successfully")
+                .message(CommonConstants.USER_REGISTERED_SUCCESSFULLY)
                 .data(userEntity)
                 .build();
     }
@@ -37,9 +40,9 @@ public class UserFacade implements IUserFacade {
         iUserService.resetPassword(otp,resetPasswordRequestDTO.getEmail(), resetPasswordRequestDTO.getPassword());
         logger.debug("Password reset completed for email: {}", resetPasswordRequestDTO.getEmail());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Password reset successfully")
+                .message(CommonConstants.PASSWORD_RESET_SUCCESSFULLY)
                 .build();
     }
 
@@ -49,17 +52,17 @@ public class UserFacade implements IUserFacade {
         if (!response) {
             logger.warn("Failed to generate OTP for email: {}", email);
             return ResponseMessageUtilityDTO.builder()
-                    .status("Failure")
+                    .status(CommonConstants.FAILURE)
                     .httpStatus(400)
-                    .message("Failed to send OTP. Email may not be registered.")
+                    .message(ErrorConstants.FAILED_TO_SEND_OTP)
                     .data(response)
                     .build();
         }
         logger.info("OTP generated successfully for email: {}", email);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("OTP sent successfully")
+                .message(CommonConstants.OTP_SENT_SUCCESSFULLY)
                 .data(response)
                 .build();
     }
@@ -70,16 +73,16 @@ public class UserFacade implements IUserFacade {
         if (!response) {
             logger.warn("Invalid or expired OTP for email: {}", email);
             return ResponseMessageUtilityDTO.builder()
-                    .status("Failure")
+                    .status(CommonConstants.FAILURE)
                     .httpStatus(400)
-                    .message("Invalid or expired OTP")
+                    .message(ErrorConstants.INVALID_OR_EXPIRED_OTP)
                     .build();
         }
         logger.info("OTP validated successfully for email: {}", email);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("OTP validation status")
+                .message(CommonConstants.OTP_VALIDATION_STATUS)
                 .data(response)
                 .build();
     }
@@ -89,9 +92,9 @@ public class UserFacade implements IUserFacade {
         UserEntity userEntity = iUserService.getUserByEmail(email);
         logger.debug("Fetched user: {}", userEntity);
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("User fetched successfully")
+                .message(CommonConstants.USER_FETCHED_SUCCESSFULLY)
                 .data(userEntity)
                 .build();
     }
@@ -101,9 +104,9 @@ public class UserFacade implements IUserFacade {
         List<UserEntity> users = iUserService.getAllDetails();
         logger.debug("Fetched {} users", users.size());
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("All user details fetched successfully")
+                .message(CommonConstants.ALL_USER_DETAILS_FETCHED_SUCCESSFULLY)
                 .data(users)
                 .build();
     }

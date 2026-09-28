@@ -8,7 +8,8 @@ import com.razorpay.RazorpayException;
 import lombok.AllArgsConstructor;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.math.BigDecimal;
 
 @Service
@@ -92,7 +93,7 @@ public class RazorpayService
     @Override
     public void refundPayment(String paymentId, BigDecimal amount, String currency) throws RazorpayException {
         if (paymentId == null || paymentId.trim().isEmpty()) {
-            throw new RazorpayException("Razorpay payment id is missing");
+            throw new RazorpayException(ErrorConstants.RAZORPAY_PAYMENT_ID_MISSING);
         }
 
         long amountInSmallestUnit = amount
@@ -106,7 +107,7 @@ public class RazorpayService
         com.razorpay.Refund refund = razorpayClient.payments.refund(paymentId, refundRequest);
         String status = refund.get("status");
         if (status == null || !("processed".equalsIgnoreCase(status) || "pending".equalsIgnoreCase(status))) {
-            throw new RazorpayException("Razorpay refund was not accepted");
+            throw new RazorpayException(ErrorConstants.RAZORPAY_REFUND_NOT_ACCEPTED);
         }
     }
 

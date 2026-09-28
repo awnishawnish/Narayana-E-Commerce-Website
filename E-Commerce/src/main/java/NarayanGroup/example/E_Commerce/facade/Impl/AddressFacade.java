@@ -3,7 +3,7 @@ package NarayanGroup.example.E_Commerce.facade.Impl;
 import NarayanGroup.example.E_Commerce.DTO.request.AddressRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.AddressResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
-import NarayanGroup.example.E_Commerce.exception.CustomException;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
 import NarayanGroup.example.E_Commerce.facade.IAddressFacade;
 import NarayanGroup.example.E_Commerce.model.Entity.Address;
 import NarayanGroup.example.E_Commerce.model.Entity.UserEntity;
@@ -69,7 +69,7 @@ public class AddressFacade implements IAddressFacade {
                 addressService.save(address);
 
         return success(
-                "Address added successfully",
+                CommonConstants.ADDRESS_ADDED_SUCCESSFULLY,
                 toResponse(saved),
                 201
         );
@@ -87,7 +87,7 @@ public class AddressFacade implements IAddressFacade {
                         .toList();
 
         return success(
-                "Addresses fetched successfully",
+                CommonConstants.ADDRESSES_FETCHED_SUCCESSFULLY,
                 addresses,
                 200
         );
@@ -139,7 +139,7 @@ public class AddressFacade implements IAddressFacade {
                 addressService.save(address);
 
         return success(
-                "Address updated successfully",
+                CommonConstants.ADDRESS_UPDATED_SUCCESSFULLY,
                 toResponse(updated),
                 200
         );
@@ -160,7 +160,7 @@ public class AddressFacade implements IAddressFacade {
         addressService.delete(address);
 
         return success(
-                "Address deleted successfully",
+                CommonConstants.ADDRESS_DELETED_SUCCESSFULLY,
                 null,
                 200
         );
@@ -188,7 +188,7 @@ public class AddressFacade implements IAddressFacade {
             int status) {
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(status)
                 .message(message)
                 .data(data)

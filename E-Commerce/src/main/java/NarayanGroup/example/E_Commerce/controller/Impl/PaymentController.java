@@ -8,7 +8,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payment")
@@ -22,9 +23,9 @@ public class PaymentController implements IPaymentController {
             @Valid @RequestBody PaymentVerificationRequestDTO request) {
         paymentService.verifyRazorpayPayment(userId, request);
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Payment verified successfully")
+                .message(CommonConstants.PAYMENT_VERIFIED_SUCCESSFULLY)
                 .build());
     }
 
@@ -36,9 +37,9 @@ public class PaymentController implements IPaymentController {
             @RequestParam(required = false) String reason) {
         paymentService.markRazorpayPaymentFailed(userId, orderId, reason);
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Payment failure recorded")
+                .message(CommonConstants.PAYMENT_FAILURE_RECORDED)
                 .build());
     }
 }

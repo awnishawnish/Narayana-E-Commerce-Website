@@ -1,11 +1,13 @@
 package NarayanGroup.example.E_Commerce.service.Impl;
+
 import NarayanGroup.example.E_Commerce.exception.CustomException;
 import NarayanGroup.example.E_Commerce.model.Entity.Address;
 import NarayanGroup.example.E_Commerce.model.Repositry.IAddressRepository;
 import NarayanGroup.example.E_Commerce.service.IAddressService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.util.List;
 
 @Service
@@ -39,7 +41,7 @@ public class AddressService implements IAddressService {
                 )
                 .orElseThrow(() ->
                         new CustomException.AddressNotFoundException(
-                                "Address not found"
+                                ErrorConstants.ADDRESS_NOT_FOUND
                         )
                 );
     }
@@ -51,7 +53,7 @@ public class AddressService implements IAddressService {
                 .findByIdAndIsDeletedFalse(addressId)
                 .orElseThrow(() ->
                         new CustomException.AddressNotFoundException(
-                                "Address not found"
+                                ErrorConstants.ADDRESS_NOT_FOUND
                         )
                 );
     }

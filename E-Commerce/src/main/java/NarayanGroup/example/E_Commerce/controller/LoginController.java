@@ -13,7 +13,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
-import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +28,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +67,7 @@ public class LoginController {
 
         if (userDetails == null) {
             logger.error("User not found with email: {}", loginDTO.getEmail());
-            throw new CustomException.UserNotFoundException("User not found with email: " + loginDTO.getEmail());
+            throw new CustomException.UserNotFoundException(ErrorConstants.USER_NOT_FOUND_WITH_EMAIL + loginDTO.getEmail());
         }
 
         String accessToken = jwtUtil.generateAccessToken(userDetails);
@@ -91,7 +91,7 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
                 .build();
 
 
-        ResponseMessageUtilityDTO responseDTO = new ResponseMessageUtilityDTO("SUCCESS", HttpStatus.OK.value(),
+        ResponseMessageUtilityDTO responseDTO = new ResponseMessageUtilityDTO(CommonConstants.PAYMENT_STATUS_SUCCESS, HttpStatus.OK.value(),
                 "Login successful", "BID", loginResponseDTO);
 
         logger.info("Login successful for user: {}", loginDTO.getEmail());
@@ -115,7 +115,7 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
 
         if (refreshToken == null) {
             logger.warn("Refresh token missing in request");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token is missing");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorConstants.REFRESH_TOKEN_MISSING);
         }
 
         try {
@@ -130,11 +130,11 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
                 return ResponseEntity.ok(response);
             } else {
                 logger.warn("Invalid refresh token for user: {}", username);
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorConstants.INVALID_REFRESH_TOKEN);
             }
         } catch (Exception e) {
             logger.error("Error validating refresh token: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ErrorConstants.INVALID_REFRESH_TOKEN);
         }
     }
 

@@ -13,7 +13,8 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -53,13 +54,13 @@ public class UserService implements IUserService {
     public boolean generateOtp(String email) {
         logger.info("Generating OTP for email: {}", email);
         if (email == null || email.isEmpty()) {
-            logger.error("Email cannot be null or empty");
-            throw new IllegalArgumentException("Email cannot be null or empty");
+            logger.error(ErrorConstants.EMAIL_CANNOT_BE_NULL_OR_EMPTY);
+            throw new IllegalArgumentException(ErrorConstants.EMAIL_CANNOT_BE_NULL_OR_EMPTY);
         }
         UserEntity user = userRepository.findByEmail(email);
         if (user == null) {
             logger.error("User not found with email: {}", email);
-            throw new CustomException.UserNotFoundException("No users found.");
+            throw new CustomException.UserNotFoundException(ErrorConstants.ONE_OR_MORE_USERS_NOT_FOUND);
         }
         String otp = String.format("%06d", new Random().nextInt(999999));
         String redisKey = "otp:" + email;
@@ -68,8 +69,8 @@ public class UserService implements IUserService {
 
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
-        message.setSubject("Your OTP Code");
-        message.setText("Your OTP code is: " + otp + "\nThis code is valid for 10 minutes.");
+        message.setSubject(CommonConstants.OTP_EMAIL_SUBJECT);
+        message.setText(String.format(CommonConstants.OTP_EMAIL_BODY, otp));
         try {
             mailSender.send(message);
             logger.info("OTP email sent successfully to: {}", email);
@@ -99,7 +100,7 @@ public class UserService implements IUserService {
 
             if (userEntity == null) {
                 logger.error("User not found with email: {}", email);
-                throw new CustomException.UserNotFoundException("No users found.");
+                throw new CustomException.UserNotFoundException(ErrorConstants.ONE_OR_MORE_USERS_NOT_FOUND);
             }
             String encodedPassword = passwordEncoder.encode(password);
             userEntity.setPassword(encodedPassword);
@@ -113,7 +114,7 @@ public class UserService implements IUserService {
         List<UserEntity> users = userRepository.findAll();
         if (users.isEmpty()) {
             logger.warn("No users found in database");
-            throw new CustomException.UserNotFoundException("No users found.");
+            throw new CustomException.UserNotFoundException(ErrorConstants.ONE_OR_MORE_USERS_NOT_FOUND);
         }
         logger.info("Fetched {} users from database", users.size());
         return users;
@@ -124,7 +125,7 @@ public class UserService implements IUserService {
         UserEntity user = userRepository.findByEmail(email);
         if (user == null) {
             logger.error("User not found with email: {}", email);
-            throw new CustomException.UserNotFoundException("User not found with email: " + email);
+            throw new CustomException.UserNotFoundException(ErrorConstants.USER_NOT_FOUND_WITH_EMAIL + email);
         }
         logger.info("User fetched successfully with email: {}", email);
         return user;
@@ -135,7 +136,7 @@ public class UserService implements IUserService {
         return userRepository.findById(userId)
                 .orElseThrow(() -> {
                     logger.error("User not found with ID: {}", userId);
-                    return new CustomException.UserNotFoundException("User not found with id: " + userId);
+                    return new CustomException.UserNotFoundException(ErrorConstants.USER_NOT_FOUND_WITH_ID + userId);
                 });
     }
 

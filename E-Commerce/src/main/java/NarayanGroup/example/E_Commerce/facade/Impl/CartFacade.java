@@ -5,6 +5,8 @@ import NarayanGroup.example.E_Commerce.DTO.request.AddCartRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.request.UpdateCartItemRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.CartResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import NarayanGroup.example.E_Commerce.exception.CustomException;
 import NarayanGroup.example.E_Commerce.facade.ICartFacade;
 import NarayanGroup.example.E_Commerce.model.Entity.Cart;
@@ -54,7 +56,7 @@ class CartFacade implements ICartFacade {
             log.warn("User not found while adding product to cart. userId={}", userId);
 
             throw new CustomException.UserNotFoundException(
-                    "User not found with id: " + userId
+                    ErrorConstants.USER_NOT_FOUND_WITH_ID + userId
             );
         }
 
@@ -87,7 +89,7 @@ class CartFacade implements ICartFacade {
             log.warn("Add to cart request contains no products. userId={}", userId);
 
             throw new CustomException.InvalidQuantityException(
-                    "Cart request must contain at least one product"
+                    ErrorConstants.CART_REQUEST_MUST_CONTAIN_PRODUCT
             );
         }
 
@@ -120,7 +122,7 @@ class CartFacade implements ICartFacade {
                 );
 
                 throw new CustomException.ProductNotFoundException(
-                        "Product not found with id: " + productId
+                        ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + productId
                 );
             }
 
@@ -142,7 +144,7 @@ class CartFacade implements ICartFacade {
                 );
 
                 throw new CustomException.InvalidQuantityException(
-                        "Quantity must be greater than zero"
+                        ErrorConstants.INVALID_QUANTITY
                 );
             }
 
@@ -157,7 +159,7 @@ class CartFacade implements ICartFacade {
                 );
 
                 throw new CustomException.InsufficientStockException(
-                        "Insufficient stock for product: " + product.getTitle()
+                        ErrorConstants.INSUFFICIENT_STOCK_FOR_PRODUCT + product.getTitle()
                 );
             }
 
@@ -195,7 +197,7 @@ class CartFacade implements ICartFacade {
                     );
 
                     throw new CustomException.InsufficientStockException(
-                            "Insufficient stock for product: " + product.getTitle()
+                            ErrorConstants.INSUFFICIENT_STOCK_FOR_PRODUCT + product.getTitle()
                     );
                 }
 
@@ -252,9 +254,9 @@ class CartFacade implements ICartFacade {
         log.debug("Cart response generated successfully. userId={}", userId);
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(201)
-                .message("Product added successfully")
+                .message(CommonConstants.PRODUCT_ADDED_SUCCESSFULLY)
                 .data(responseDTO)
                 .build();
     }
@@ -276,7 +278,7 @@ class CartFacade implements ICartFacade {
             log.warn("Cart not found for userId={}", userId);
 
             throw new CustomException.CartNotFoundException(
-                    "Cart not found for user: " + userId
+                    ErrorConstants.CART_NOT_FOUND_FOR_USER + userId
             );
         }
 
@@ -297,9 +299,9 @@ class CartFacade implements ICartFacade {
         log.debug("Cart response generated successfully. userId={}", userId);
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Cart fetched successfully")
+                .message(CommonConstants.CART_FETCHED_SUCCESSFULLY)
                 .data(responseDTO)
                 .build();
     }
@@ -332,7 +334,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.InvalidQuantityException(
-                    "Quantity must be greater than zero"
+                    ErrorConstants.INVALID_QUANTITY
             );
         }
 
@@ -355,7 +357,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.CartItemNotFoundException(
-                    "Cart item not found with id: " + cartItemId
+                    ErrorConstants.CART_ITEM_NOT_FOUND + cartItemId
             );
         }
 
@@ -379,7 +381,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.UnauthorizedCartAccessException(
-                    "You are not authorized to modify this cart item"
+                    ErrorConstants.UNAUTHORIZED_CART_ITEM
             );
         }
 
@@ -404,7 +406,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.InsufficientStockException(
-                    "Insufficient stock for product: " + product.getTitle()
+                    ErrorConstants.INSUFFICIENT_STOCK_FOR_PRODUCT + product.getTitle()
             );
         }
 
@@ -440,9 +442,9 @@ class CartFacade implements ICartFacade {
                 cartTransformer.toCartResponseDTO(cart);
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Cart item quantity updated successfully")
+                .message(CommonConstants.CART_ITEM_QUANTITY_UPDATED_SUCCESSFULLY)
                 .data(responseDTO)
                 .build();
     }
@@ -476,7 +478,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.CartItemNotFoundException(
-                    "Cart item not found with id: " + cartItemId
+                    ErrorConstants.CART_ITEM_NOT_FOUND + cartItemId
             );
         }
 
@@ -499,7 +501,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.UnauthorizedCartAccessException(
-                    "You are not authorized to modify this cart item"
+                    ErrorConstants.UNAUTHORIZED_CART_ITEM
             );
         }
 
@@ -543,9 +545,9 @@ class CartFacade implements ICartFacade {
                 cartTransformer.toCartResponseDTO(cart);
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Product removed from cart successfully")
+                .message(CommonConstants.PRODUCT_REMOVED_FROM_CART_SUCCESSFULLY)
                 .data(responseDTO)
                 .build();
     }
@@ -568,7 +570,7 @@ class CartFacade implements ICartFacade {
             log.warn("Cart not found while clearing cart. userId={}", userId);
 
             throw new CustomException.CartNotFoundException(
-                    "Cart not found"
+                    ErrorConstants.CART_NOT_FOUND
             );
         }
 
@@ -596,9 +598,9 @@ class CartFacade implements ICartFacade {
         log.debug("Cart cleared successfully. userId={}", userId);
 
         return ResponseMessageUtilityDTO.builder()
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message("Cart cleared successfully")
+                .message(CommonConstants.CART_CLEARED_SUCCESSFULLY)
                 .data(null)
                 .build();
     }
@@ -673,10 +675,10 @@ class CartFacade implements ICartFacade {
         if (authentication == null ||
                 !authentication.isAuthenticated()) {
 
-            log.warn("User authentication failed or authentication context is unavailable");
+            log.warn(ErrorConstants.USER_AUTHENTICATION_FAILED);
 
             throw new CustomException.UnauthorizedException(
-                    "User is not authenticated"
+                    ErrorConstants.USER_NOT_AUTHENTICATED
             );
         }
 
@@ -698,7 +700,7 @@ class CartFacade implements ICartFacade {
             );
 
             throw new CustomException.UserNotFoundException(
-                    "User not found with email: " + email
+                    ErrorConstants.USER_NOT_FOUND_WITH_EMAIL + email
             );
         }
 

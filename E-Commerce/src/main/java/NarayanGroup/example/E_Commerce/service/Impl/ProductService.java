@@ -1,8 +1,6 @@
 package NarayanGroup.example.E_Commerce.service.Impl;
 
-import NarayanGroup.example.E_Commerce.DTO.request.ProductRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.request.ProductUpdateRequestDTO;
-import NarayanGroup.example.E_Commerce.DTO.response.ProductResponseDTO;
 import NarayanGroup.example.E_Commerce.exception.CustomException;
 import NarayanGroup.example.E_Commerce.model.Entity.Product;
 import NarayanGroup.example.E_Commerce.model.Repositry.IProductRepository;
@@ -14,8 +12,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,8 +66,8 @@ public class ProductService implements IProductService {
     public Page<Product> searchProducts(String keyword, Pageable pageable) {
         logger.info("Searching products with keyword: {}", keyword);
         if (keyword == null || keyword.isBlank()) {
-            logger.error("Search keyword cannot be empty");
-            throw new IllegalArgumentException("Search keyword cannot be empty");
+            logger.error(ErrorConstants.SEARCH_KEYWORD_CANNOT_BE_EMPTY);
+            throw new IllegalArgumentException(ErrorConstants.SEARCH_KEYWORD_CANNOT_BE_EMPTY);
         }
         return iProductRepository.searchByTitleKeyword(keyword, pageable);
     }
@@ -81,7 +79,7 @@ public class ProductService implements IProductService {
                 .filter(p -> !p.isDeleted())
                 .orElseThrow(() -> {
                     logger.error("Product not found with ID: {}", id);
-                    return new CustomException.UserNotFoundException("Product not found with id: " + id);
+                    return new CustomException.UserNotFoundException(ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + id);
                 });
 
     }
@@ -92,7 +90,7 @@ public class ProductService implements IProductService {
         Product product = iProductRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Product not found with ID: {}", id);
-                    return new CustomException.UserNotFoundException("Product not found with id: " + id);
+                    return new CustomException.UserNotFoundException(ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + id);
                 });
         product.setDeleted(true);
         iProductRepository.save(product);
@@ -105,13 +103,13 @@ public class ProductService implements IProductService {
         Product product = iProductRepository.findById(id)
                 .orElseThrow(() -> {
                     logger.error("Product not found with ID: {}", id);
-                    return new CustomException.UserNotFoundException("Product not found with id: " + id);
+                    return new CustomException.UserNotFoundException(ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + id);
                 });
 
         int newQuantity = product.getQuantity() + delta;
         if (newQuantity < 0) {
             logger.error("Insufficient stock for product ID: {}. Available: {}", id, product.getQuantity());
-            throw new IllegalArgumentException("Insufficient stock. Available: " + product.getQuantity());
+            throw new IllegalArgumentException(ErrorConstants.INSUFFICIENT_STOCK + product.getQuantity());
         }
         product.setQuantity(newQuantity);
         return iProductRepository.save(product);
@@ -125,7 +123,7 @@ public class ProductService implements IProductService {
                 .filter(p -> !p.isDeleted())
                 .orElseThrow(() -> {
                     logger.error("Product not found with ID: {}", id);
-                    return new CustomException.UserNotFoundException("Product not found with id: " + id);
+                    return new CustomException.UserNotFoundException(ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + id);
                 });
 
         if (request.getTitle() != null) product.setTitle(request.getTitle());
@@ -146,8 +144,8 @@ public class ProductService implements IProductService {
     public Page<Product> searchByName(String name, Pageable pageable) {
         logger.info("Searching products with keyword: {}", name);
         if (name == null || name.isBlank()) {
-            logger.error("Search keyword cannot be empty");
-            throw new IllegalArgumentException("Search keyword cannot be empty");
+            logger.error(ErrorConstants.SEARCH_KEYWORD_CANNOT_BE_EMPTY);
+            throw new IllegalArgumentException(ErrorConstants.SEARCH_KEYWORD_CANNOT_BE_EMPTY);
         }
         return iProductRepository.searchByName(name, pageable);
     }
@@ -164,7 +162,7 @@ public class ProductService implements IProductService {
                     );
 
                     return new CustomException.ProductNotFoundException(
-                            "Product not found with id: " + id
+                            ErrorConstants.PRODUCT_NOT_FOUND_WITH_ID + id
                     );
                 });
     }

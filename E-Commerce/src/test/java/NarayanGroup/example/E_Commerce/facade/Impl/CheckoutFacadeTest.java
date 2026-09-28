@@ -2,6 +2,7 @@ package NarayanGroup.example.E_Commerce.facade.Impl;
 
 import NarayanGroup.example.E_Commerce.DTO.request.CheckoutRequestDTO;
 import NarayanGroup.example.E_Commerce.configuration.RazorpayConfig;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
 import NarayanGroup.example.E_Commerce.kafka.producer.DomainEventProducer;
 import NarayanGroup.example.E_Commerce.model.Entity.*;
 import NarayanGroup.example.E_Commerce.model.Repositry.IOrderRepository;
@@ -15,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -66,12 +66,12 @@ class CheckoutFacadeTest {
         });
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CheckoutRequestDTO request = CheckoutRequestDTO.builder().addressId(3L).paymentMethod("COD").build();
+        CheckoutRequestDTO request = CheckoutRequestDTO.builder().addressId(3L).paymentMethod(CommonConstants.COD).build();
         var response = facade.checkout(1L, request);
 
-        assertEquals("Success", response.getStatus());
+        assertEquals(CommonConstants.SUCCESS, response.getStatus());
         assertEquals(201, response.getHttpStatus());
-        assertEquals("Order placed successfully", response.getMessage());
+        assertEquals(CommonConstants.ORDER_PLACED_SUCCESSFULLY, response.getMessage());
         verify(cartService).removeItem(1L, 20L);
         verify(eventProducer).publishOrderConfirmed(any());
         verifyNoInteractions(razorpayService);

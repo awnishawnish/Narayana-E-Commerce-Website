@@ -19,7 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -43,25 +44,25 @@ public class PaymentService implements IPaymentService {
     @Transactional
     public Payment verifyRazorpayPayment(Long userId, PaymentVerificationRequestDTO request) {
         Order order = orderRepository.findByIdAndUserIdAndIsDeletedFalse(request.getOrderId(), userId)
-                .orElseThrow(() -> new CustomException.CheckoutException("Order not found"));
+                .orElseThrow(() -> new CustomException.CheckoutException(ErrorConstants.ORDER_NOT_FOUND));
 
         Payment payment = paymentRepository.findByOrderIdAndIsDeletedFalse(order.getId())
-                .orElseThrow(() -> new CustomException.CheckoutException("Payment not found"));
+                .orElseThrow(() -> new CustomException.CheckoutException(ErrorConstants.PAYMENT_NOT_FOUND));
 
-        if (!"RAZORPAY".equalsIgnoreCase(payment.getPaymentMethod())) {
-            throw new CustomException.CheckoutException("Order is not a Razorpay payment");
+        if (!CommonConstants.RAZORPAY.equalsIgnoreCase(payment.getPaymentMethod())) {
+            throw new CustomException.CheckoutException(ErrorConstants.ORDER_NOT_RAZORPAY_PAYMENT);
         }
 
         if (!request.getRazorpayOrderId().equals(payment.getGatewayOrderId())) {
-            throw new CustomException.CheckoutException("Razorpay order does not match our payment");
+            throw new CustomException.CheckoutException(ErrorConstants.RAZORPAY_ORDER_MISMATCH);
         }
 
-        if ("SUCCESS".equalsIgnoreCase(payment.getStatus())) {
+        if (CommonConstants.PAYMENT_STATUS_SUCCESS.equalsIgnoreCase(payment.getStatus())) {
             return payment;
         }
 
         if (!isValidSignature(payment.getGatewayOrderId(), request.getRazorpayPaymentId(), request.getRazorpaySignature())) {
-            throw new CustomException.CheckoutException("Invalid Razorpay payment signature");
+            throw new CustomException.CheckoutException(ErrorConstants.INVALID_RAZORPAY_SIGNATURE);
         }
 
         try {
@@ -71,20 +72,20 @@ public class PaymentService implements IPaymentService {
                     payment.getAmount(),
                     payment.getCurrency());
             if (!captured) {
-                throw new CustomException.CheckoutException("Razorpay payment is not captured or does not match the order");
+                throw new CustomException.CheckoutException(ErrorConstants.RAZORPAY_PAYMENT_INVALID);
             }
         } catch (CustomException.CheckoutException ex) {
             throw ex;
         } catch (Exception ex) {
-            throw new CustomException.CheckoutException("Unable to validate Razorpay payment");
+            throw new CustomException.CheckoutException(ErrorConstants.RAZORPAY_VALIDATION_FAILED);
         }
 
         payment.setGatewayPaymentId(request.getRazorpayPaymentId());
         payment.setGatewaySignature(request.getRazorpaySignature());
-        payment.setStatus("SUCCESS");
+        payment.setStatus(CommonConstants.PAYMENT_STATUS_SUCCESS);
         Payment savedPayment = paymentRepository.save(payment);
 
-        order.setPaymentStatus("SUCCESS");
+        order.setPaymentStatus(CommonConstants.PAYMENT_STATUS_SUCCESS);
         order.setStatus(NarayanGroup.example.E_Commerce.model.Enum.OrderStatus.CONFIRMED);
         orderRepository.save(order);
 
@@ -126,22 +127,22 @@ public class PaymentService implements IPaymentService {
     @Transactional
     public Payment markRazorpayPaymentFailed(Long userId, Long orderId, String reason) {
         Order order = orderRepository.findByIdAndUserIdAndIsDeletedFalse(orderId, userId)
-                .orElseThrow(() -> new CustomException.CheckoutException("Order not found"));
+                .orElseThrow(() -> new CustomException.CheckoutException(ErrorConstants.ORDER_NOT_FOUND));
         Payment payment = paymentRepository.findByOrderIdAndIsDeletedFalse(orderId)
-                .orElseThrow(() -> new CustomException.CheckoutException("Payment not found"));
+                .orElseThrow(() -> new CustomException.CheckoutException(ErrorConstants.PAYMENT_NOT_FOUND));
 
-        if (!"RAZORPAY".equalsIgnoreCase(payment.getPaymentMethod())) {
-            throw new CustomException.CheckoutException("Order is not a Razorpay payment");
+        if (!CommonConstants.RAZORPAY.equalsIgnoreCase(payment.getPaymentMethod())) {
+            throw new CustomException.CheckoutException(ErrorConstants.ORDER_NOT_RAZORPAY_PAYMENT);
         }
-        if ("SUCCESS".equalsIgnoreCase(payment.getStatus())
+        if (CommonConstants.PAYMENT_STATUS_SUCCESS.equalsIgnoreCase(payment.getStatus())
                 || "CANCELLED".equalsIgnoreCase(payment.getStatus())
-                || "REFUNDED".equalsIgnoreCase(payment.getStatus())) {
+                || CommonConstants.PAYMENT_STATUS_REFUNDED.equalsIgnoreCase(payment.getStatus())) {
             return payment;
         }
 
-        payment.setStatus("FAILED");
+        payment.setStatus(CommonConstants.PAYMENT_STATUS_FAILED);
         Payment saved = paymentRepository.save(payment);
-        order.setPaymentStatus("FAILED");
+        order.setPaymentStatus(CommonConstants.PAYMENT_STATUS_FAILED);
         order.setStatus(NarayanGroup.example.E_Commerce.model.Enum.OrderStatus.CANCELLED);
         orderRepository.save(order);
 
@@ -150,7 +151,7 @@ public class PaymentService implements IPaymentService {
                 .orderId(order.getId())
                 .orderNumber(order.getOrderNumber())
                 .paymentId(payment.getPaymentId())
-                .reason(reason == null || reason.trim().isEmpty() ? "Payment failed" : reason)
+                .reason(reason == null || reason.trim().isEmpty() ? ErrorConstants.PAYMENT_FAILED : reason)
                 .userId(order.getUser().getId())
                 .userEmail(order.getUser().getEmail())
                 .items(order.getOrderItems().stream()
@@ -184,7 +185,7 @@ public class PaymentService implements IPaymentService {
             byte[] digest = mac.doFinal((orderId + "|" + paymentId).getBytes(StandardCharsets.UTF_8));
             return constantTimeEquals(toHex(digest), signature);
         } catch (Exception ex) {
-            throw new CustomException.CheckoutException("Unable to verify Razorpay payment");
+            throw new CustomException.CheckoutException(ErrorConstants.RAZORPAY_VERIFICATION_FAILED);
         }
     }
 

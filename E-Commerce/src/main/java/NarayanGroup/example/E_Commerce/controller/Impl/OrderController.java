@@ -9,7 +9,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/order")
@@ -20,8 +21,8 @@ public class OrderController implements IOrderController {
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> getOrders(@PathVariable Long userId) {
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
-                .status("Success").httpStatus(200)
-                .message("Orders fetched successfully")
+                .status(CommonConstants.SUCCESS).httpStatus(200)
+                .message(CommonConstants.ORDERS_FETCHED_SUCCESSFULLY)
                 .data(orderService.getOrders(userId)).build());
     }
 
@@ -29,8 +30,8 @@ public class OrderController implements IOrderController {
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> getOrder(@PathVariable Long userId, @PathVariable Long orderId) {
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
-                .status("Success").httpStatus(200)
-                .message("Order fetched successfully")
+                .status(CommonConstants.SUCCESS).httpStatus(200)
+                .message(CommonConstants.ORDER_FETCHED_SUCCESSFULLY)
                 .data(orderService.getOrder(userId, orderId)).build());
     }
 
@@ -41,8 +42,8 @@ public class OrderController implements IOrderController {
             @RequestParam(required = false) String reason) {
         orderService.cancelOrder(userId, orderId, reason);
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
-                .status("Success").httpStatus(200)
-                .message("Order cancelled successfully").build());
+                .status(CommonConstants.SUCCESS).httpStatus(200)
+                .message(CommonConstants.ORDER_CANCELLED_SUCCESSFULLY).build());
     }
 
     @GetMapping("/{userId}/{orderId}/invoice")

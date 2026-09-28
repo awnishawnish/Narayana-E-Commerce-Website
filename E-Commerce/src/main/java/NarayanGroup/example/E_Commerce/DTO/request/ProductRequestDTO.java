@@ -7,10 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Collections;
 
 @Data
 @Builder
@@ -18,18 +17,18 @@ import java.util.Collections;
 @NoArgsConstructor
 public class ProductRequestDTO {
 
-    @NotBlank(message = "Title is required")
+    @NotBlank(message = ErrorConstants.TITLE_REQUIRED)
     private String title;
 
-    @NotBlank(message = "Category is required")
+    @NotBlank(message = ErrorConstants.CATEGORY_REQUIRED)
     private String category;
 
-    @NotNull(message = "Price is required")
-    @Positive(message = "Price must be positive")
+    @NotNull(message = ErrorConstants.PRICE_REQUIRED)
+    @Positive(message = ErrorConstants.PRICE_MUST_BE_POSITIVE)
     private BigDecimal price;
 
-    @NotNull(message = "Quantity is required")
-    @Positive(message = "Quantity must be positive")
+    @NotNull(message = ErrorConstants.QUANTITY_REQUIRED)
+    @Positive(message = ErrorConstants.QUANTITY_MUST_BE_POSITIVE)
     private Integer quantity;
 
     private String currency;

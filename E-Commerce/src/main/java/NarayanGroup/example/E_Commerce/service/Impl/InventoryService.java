@@ -9,7 +9,8 @@ import NarayanGroup.example.E_Commerce.service.IInventoryService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @Service
 @AllArgsConstructor
 public class InventoryService implements IInventoryService {
@@ -21,7 +22,7 @@ public class InventoryService implements IInventoryService {
     public Inventory findByProductId(Long productId) {
         return inventoryRepository.findByProductIdAndIsDeletedFalse(productId)
                 .orElseThrow(() -> new CustomException.InventoryNotFoundException(
-                        "Inventory not found for product: " + productId));
+                        ErrorConstants.INVENTORY_NOT_FOUND + productId));
     }
 
     @Override
@@ -29,14 +30,14 @@ public class InventoryService implements IInventoryService {
     public Inventory reserveStock(Long productId, Long quantity) {
         Inventory inventory = inventoryRepository.findForUpdate(productId)
                 .orElseThrow(() -> new CustomException.InventoryNotFoundException(
-                        "Inventory not found for product: " + productId));
+                        ErrorConstants.INVENTORY_NOT_FOUND + productId));
 
         if (quantity == null || quantity <= 0) {
-            throw new CustomException.InsufficientStockException("Quantity must be greater than zero");
+            throw new CustomException.InsufficientStockException(ErrorConstants.INVALID_QUANTITY);
         }
         if (inventory.getAvailableQuantity() < quantity) {
             throw new CustomException.InsufficientStockException(
-                    "Insufficient stock for product: " + productId);
+                    ErrorConstants.INSUFFICIENT_STOCK_FOR_PRODUCT + productId);
         }
 
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantity);
@@ -49,16 +50,16 @@ public class InventoryService implements IInventoryService {
     public Inventory finalizeReservation(Long productId, Long quantity) {
         Inventory inventory = inventoryRepository.findForUpdate(productId)
                 .orElseThrow(() -> new CustomException.InventoryNotFoundException(
-                        "Inventory not found for product: " + productId));
+                        ErrorConstants.INVENTORY_NOT_FOUND + productId));
 
         if (quantity == null || quantity <= 0 || inventory.getReservedQuantity() < quantity) {
-            throw new CustomException.CheckoutException("Invalid inventory reservation for product: " + productId);
+            throw new CustomException.CheckoutException(ErrorConstants.INVALID_INVENTORY_RESERVATION + productId);
         }
 
         Product product = inventory.getProduct();
         if (product.getQuantity() == null || product.getQuantity() < quantity) {
             throw new CustomException.InsufficientStockException(
-                    "Product quantity is insufficient for product: " + productId);
+                    ErrorConstants.PRODUCT_QUANTITY_INSUFFICIENT + productId);
         }
 
         inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
@@ -72,10 +73,10 @@ public class InventoryService implements IInventoryService {
     public Inventory releaseReservation(Long productId, Long quantity) {
         Inventory inventory = inventoryRepository.findForUpdate(productId)
                 .orElseThrow(() -> new CustomException.InventoryNotFoundException(
-                        "Inventory not found for product: " + productId));
+                        ErrorConstants.INVENTORY_NOT_FOUND + productId));
 
         if (quantity == null || quantity <= 0 || inventory.getReservedQuantity() < quantity) {
-            throw new CustomException.CheckoutException("Invalid inventory reservation for product: " + productId);
+            throw new CustomException.CheckoutException(ErrorConstants.INVALID_INVENTORY_RESERVATION + productId);
         }
 
         inventory.setReservedQuantity(inventory.getReservedQuantity() - quantity);
@@ -92,10 +93,10 @@ public class InventoryService implements IInventoryService {
     public Inventory cancelReservationOrRestoreStock(Long productId, Long quantity) {
         Inventory inventory = inventoryRepository.findForUpdate(productId)
                 .orElseThrow(() -> new CustomException.InventoryNotFoundException(
-                        "Inventory not found for product: " + productId));
+                        ErrorConstants.INVENTORY_NOT_FOUND + productId));
 
         if (quantity == null || quantity <= 0) {
-            throw new CustomException.CheckoutException("Invalid cancellation quantity for product: " + productId);
+            throw new CustomException.CheckoutException(ErrorConstants.INVALID_CANCELLATION_QUANTITY + productId);
         }
 
         long fromReservation = Math.min(inventory.getReservedQuantity(), quantity);

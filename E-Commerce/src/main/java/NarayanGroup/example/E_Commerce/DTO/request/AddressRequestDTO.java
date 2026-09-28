@@ -3,44 +3,44 @@ package NarayanGroup.example.E_Commerce.DTO.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddressRequestDTO {
 
-    @NotBlank(message = "Full name is required")
+    @NotBlank(message = ErrorConstants.FULL_NAME_REQUIRED)
     private String fullName;
 
-    @NotBlank(message = "Phone is required")
+    @NotBlank(message = ErrorConstants.PHONE_REQUIRED)
     @Pattern(
             regexp = "^[6-9]\\d{9}$",
-            message = "Phone number must be exactly 10 digits"
+            message = ErrorConstants.PHONE_NUMBER_EXACTLY_10_DIGITS
     )
     private String phone;
 
-    @NotBlank(message = "Address line 1 is required")
+    @NotBlank(message = ErrorConstants.ADDRESS_LINE_1_REQUIRED)
     private String addressLine1;
 
     // Optional
     private String addressLine2;
 
-    @NotBlank(message = "City is required")
+    @NotBlank(message = ErrorConstants.CITY_REQUIRED)
     private String city;
 
-    @NotBlank(message = "State is required")
+    @NotBlank(message = ErrorConstants.STATE_REQUIRED)
     private String state;
 
-    @NotBlank(message = "Pincode is required")
+    @NotBlank(message = ErrorConstants.PINCODE_REQUIRED)
     @Pattern(
             regexp = "^\\d{6}$",
-            message = "Pincode must contain exactly 6 digits"
+            message = ErrorConstants.PINCODE_EXACTLY_6_DIGITS
     )
     private String pincode;
 

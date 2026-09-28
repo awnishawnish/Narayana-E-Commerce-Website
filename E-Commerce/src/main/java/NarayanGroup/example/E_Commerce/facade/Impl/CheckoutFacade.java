@@ -4,6 +4,8 @@ import NarayanGroup.example.E_Commerce.DTO.request.CheckoutRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.CheckoutResponseDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ResponseMessageUtilityDTO;
 import NarayanGroup.example.E_Commerce.configuration.RazorpayConfig;
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import NarayanGroup.example.E_Commerce.exception.CustomException;
 import NarayanGroup.example.E_Commerce.kafka.event.OrderConfirmedEvent;
 import NarayanGroup.example.E_Commerce.kafka.event.PaymentItemEvent;
@@ -50,7 +52,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         if (request.getPaymentMethod() == null ||
                 request.getPaymentMethod().trim().isEmpty()) {
             throw new CustomException.CheckoutException(
-                    "Payment method is required"
+                    ErrorConstants.PAYMENT_METHOD_REQUIRED
             );
         }
         String paymentMethod =
@@ -58,12 +60,12 @@ public class CheckoutFacade implements ICheckoutFacade {
                         .trim()
                         .toUpperCase();
 
-        if (!paymentMethod.equals("COD")
-                && !paymentMethod.equals("RAZORPAY")) {
+        if (!paymentMethod.equals(CommonConstants.COD)
+                && !paymentMethod.equals(CommonConstants.RAZORPAY)) {
 
             throw new CustomException.CheckoutException(
-                    "Invalid payment method. " +
-                            "Supported methods are COD and RAZORPAY"
+                    ErrorConstants.INVALID_PAYMENT_METHOD +
+                            ErrorConstants.SUPPORTED_PAYMENT_METHODS
             );
         }
 
@@ -80,7 +82,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         if (cart == null) {
 
             throw new CustomException.CartNotFoundException(
-                    "Cart not found"
+                    ErrorConstants.CART_NOT_FOUND
             );
         }
 
@@ -100,7 +102,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         if (activeCartItems.isEmpty()) {
 
             throw new CustomException.CheckoutException(
-                    "Cart is empty"
+                    ErrorConstants.CART_EMPTY
             );
         }
 
@@ -169,7 +171,7 @@ public class CheckoutFacade implements ICheckoutFacade {
             if (!activeCartItemIds.containsAll(requestedIds)) {
 
                 throw new CustomException.CheckoutException(
-                        "One or more selected cart items are invalid"
+                        ErrorConstants.INVALID_SELECTED_CART_ITEMS
                 );
             }
 
@@ -190,7 +192,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         if (checkoutItems.isEmpty()) {
 
             throw new CustomException.CheckoutException(
-                    "No items selected for checkout"
+                    ErrorConstants.NO_ITEMS_SELECTED_FOR_CHECKOUT
             );
         }
 
@@ -249,8 +251,7 @@ public class CheckoutFacade implements ICheckoutFacade {
             if (!currency.equals(product.getCurrency())) {
 
                 throw new CustomException.CheckoutException(
-                        "Products with different currencies " +
-                                "cannot be checked out together"
+                        ErrorConstants.DIFFERENT_CURRENCIES
                 );
             }
 
@@ -331,7 +332,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         OrderStatus initialOrderStatus;
 
 
-        if ("COD".equals(paymentMethod)) {
+        if (CommonConstants.COD.equals(paymentMethod)) {
 
             initialOrderStatus =
                     OrderStatus.CONFIRMED;
@@ -363,7 +364,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                          *
                          * Razorpay payment is also initially pending.
                          */
-                        .paymentStatus("PENDING")
+                        .paymentStatus(CommonConstants.PAYMENT_STATUS_PENDING)
 
                         .paymentMethod(paymentMethod)
 
@@ -499,7 +500,7 @@ public class CheckoutFacade implements ICheckoutFacade {
         String razorpayOrderId = null;
 
 
-        if ("RAZORPAY".equals(paymentMethod)) {
+        if (CommonConstants.RAZORPAY.equals(paymentMethod)) {
 
             try {
 
@@ -513,7 +514,7 @@ public class CheckoutFacade implements ICheckoutFacade {
             } catch (Exception e) {
 
                 throw new CustomException.CheckoutException(
-                        "Unable to create Razorpay order"
+                        ErrorConstants.RAZORPAY_ORDER_CREATION_FAILED
                 );
             }
         }
@@ -539,7 +540,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                 Payment.builder()
 
                         .paymentId(
-                                "PAY-" +
+                                CommonConstants.PAYMENT_ID_PREFIX +
                                         UUID.randomUUID()
                                                 .toString()
                                                 .replace("-", "")
@@ -564,7 +565,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                         )
 
                         .status(
-                                "PENDING"
+                                CommonConstants.PAYMENT_STATUS_PENDING
                         )
 
                         .isDeleted(false)
@@ -590,7 +591,7 @@ public class CheckoutFacade implements ICheckoutFacade {
          * not the complete cart.
          */
 
-        if ("COD".equals(paymentMethod)) {
+        if (CommonConstants.COD.equals(paymentMethod)) {
 
             for (CartItem cartItem : checkoutItems) {
 
@@ -652,7 +653,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                         )
 
                         .razorpayKeyId(
-                                "RAZORPAY".equals(paymentMethod)
+                                CommonConstants.RAZORPAY.equals(paymentMethod)
                                         ? razorpayConfig.getKeyId()
                                         : null
                         )
@@ -687,21 +688,21 @@ public class CheckoutFacade implements ICheckoutFacade {
 
         String message;
 
-        if ("COD".equals(paymentMethod)) {
+        if (CommonConstants.COD.equals(paymentMethod)) {
 
             message =
-                    "Order placed successfully";
+                    CommonConstants.ORDER_PLACED_SUCCESSFULLY;
 
         } else {
 
             message =
-                    "Checkout initiated successfully";
+                    CommonConstants.CHECKOUT_INITIATED_SUCCESSFULLY;
         }
 
 
         return ResponseMessageUtilityDTO.builder()
 
-                .status("Success")
+                .status(CommonConstants.SUCCESS)
 
                 .httpStatus(201)
 
@@ -734,7 +735,7 @@ public class CheckoutFacade implements ICheckoutFacade {
 
     private String generateOrderNumber() {
 
-        return "ORD-" +
+        return CommonConstants.ORDER_NUMBER_PREFIX +
                 System.currentTimeMillis() +
                 "-" +
                 UUID.randomUUID()

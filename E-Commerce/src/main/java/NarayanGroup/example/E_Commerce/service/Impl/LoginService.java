@@ -14,9 +14,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import NarayanGroup.example.E_Commerce.constant.CommonConstants;
+import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @Service
 @Lazy
 @AllArgsConstructor
@@ -33,7 +33,7 @@ public class LoginService implements UserDetailsService {
         UserEntity userModel = userRepository.findByEmail(email);
         if (userModel == null) {
             logger.error("User not found with email: {}", email);
-            throw new UsernameNotFoundException("User not found with email: " + email);
+            throw new UsernameNotFoundException(ErrorConstants.USER_NOT_FOUND_WITH_EMAIL + email);
         }
         logger.info("User found: {}", userModel.getEmail());
         return buildUserForAuthentication(userModel);
