@@ -174,7 +174,15 @@ public class OrderService implements IOrderService {
         Order order = orderRepository.findByIdAndIsDeletedFalse(orderId).orElse(null);
         if (order == null || order.getStatus() != OrderStatus.PENDING_PAYMENT) return;
         if (order.getCreatedAt() == null || order.getCreatedAt().plusMinutes(paymentTimeoutMinutes).isAfter(LocalDateTime.now())) return;
-        cancelOrder(order.getUser().getId(), order.getId(), ErrorConstants.PAYMENT_WINDOW_EXPIRED);
+
+        paymentRepository.findByOrderIdAndIsDeletedFalse(orderId).ifPresent(payment -> {
+            payment.setStatus(CommonConstants.PAYMENT_STATUS_FAILED);
+            paymentRepository.save(payment);
+        });
+
+        order.setStatus(OrderStatus.CANCELLED);
+        order.setPaymentStatus(CommonConstants.PAYMENT_STATUS_FAILED);
+        orderRepository.save(order);
     }
 
     private Order findOrder(Long userId, Long orderId) {

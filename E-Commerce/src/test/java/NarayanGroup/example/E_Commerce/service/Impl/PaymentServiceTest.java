@@ -89,4 +89,60 @@ class PaymentServiceTest {
         for (byte b : digest) hex.append(String.format("%02x", b));
         return hex.toString();
     }
+
+    @Test void verify_shouldReturnAlreadySuccessfulPaymentWithoutGatewayCall() {
+        UserEntity user=UserEntity.builder().id(7L).build();
+        Order order=Order.builder().id(1L).user(user).build();
+        Payment payment=Payment.builder().order(order).paymentMethod(CommonConstants.RAZORPAY)
+                .status(CommonConstants.PAYMENT_STATUS_SUCCESS).gatewayOrderId("order_1").build();
+        when(orderRepository.findByIdAndUserIdAndIsDeletedFalse(1L,7L)).thenReturn(Optional.of(order));
+        when(paymentRepository.findByOrderIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(payment));
+        PaymentVerificationRequestDTO request=PaymentVerificationRequestDTO.builder().orderId(1L).razorpayOrderId("order_1")
+                .razorpayPaymentId("pay_1").razorpaySignature("ignored").build();
+        assertSame(payment,service.verifyRazorpayPayment(7L,request));
+        verifyNoInteractions(razorpayService,eventProducer);
+    }
+
+    @Test void verify_shouldRejectWrongMethodAndOrderAndCapturedFailure() {
+        UserEntity user=UserEntity.builder().id(7L).build(); Order order=Order.builder().id(1L).user(user).build();
+        Payment payment=Payment.builder().order(order).paymentMethod(CommonConstants.COD).status(CommonConstants.PAYMENT_STATUS_PENDING).gatewayOrderId("order_1").build();
+        when(orderRepository.findByIdAndUserIdAndIsDeletedFalse(1L,7L)).thenReturn(Optional.of(order));
+        when(paymentRepository.findByOrderIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(payment));
+        PaymentVerificationRequestDTO req=PaymentVerificationRequestDTO.builder().orderId(1L).razorpayOrderId("order_1").razorpayPaymentId("pay").razorpaySignature("x").build();
+        assertThrows(RuntimeException.class,()->service.verifyRazorpayPayment(7L,req));
+
+        payment.setPaymentMethod(CommonConstants.RAZORPAY); req.setRazorpayOrderId("other");
+        assertThrows(RuntimeException.class,()->service.verifyRazorpayPayment(7L,req));
+    }
+
+    @Test void verify_shouldRejectWhenGatewayPaymentNotCaptured() throws Exception {
+        UserEntity user=UserEntity.builder().id(7L).build(); Product product=Product.builder().id(10L).build();
+        OrderItem item=OrderItem.builder().product(product).quantity(1L).build();
+        Order order=Order.builder().id(1L).user(user).orderItems(java.util.List.of(item)).build();
+        Payment payment=Payment.builder().order(order).paymentMethod(CommonConstants.RAZORPAY).status(CommonConstants.PAYMENT_STATUS_PENDING)
+                .gatewayOrderId("order_1").amount(new java.math.BigDecimal("100")).currency("INR").build();
+        when(orderRepository.findByIdAndUserIdAndIsDeletedFalse(1L,7L)).thenReturn(Optional.of(order));
+        when(paymentRepository.findByOrderIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(payment));
+        when(razorpayService.isPaymentCaptured(anyString(),anyString(),any(),anyString())).thenReturn(false);
+        String signature=sign("order_1|pay_1","secret");
+        var req=PaymentVerificationRequestDTO.builder().orderId(1L).razorpayOrderId("order_1").razorpayPaymentId("pay_1").razorpaySignature(signature).build();
+        assertThrows(RuntimeException.class,()->service.verifyRazorpayPayment(7L,req));
+    }
+
+    @Test void markPaymentFailed_shouldPublishAndHandleIdempotentStates() {
+        UserEntity user=UserEntity.builder().id(7L).email("u@test.com").build();
+        Order order=Order.builder().id(1L).orderNumber("ORD-1").user(user).orderItems(java.util.List.of()).build();
+        Payment payment=Payment.builder().order(order).paymentId("PAY-1").paymentMethod(CommonConstants.RAZORPAY).status(CommonConstants.PAYMENT_STATUS_PENDING).build();
+        when(orderRepository.findByIdAndUserIdAndIsDeletedFalse(1L,7L)).thenReturn(Optional.of(order));
+        when(paymentRepository.findByOrderIdAndIsDeletedFalse(1L)).thenReturn(Optional.of(payment));
+        when(paymentRepository.save(payment)).thenReturn(payment);
+        assertSame(payment,service.markRazorpayPaymentFailed(7L,1L,""));
+        assertEquals(CommonConstants.PAYMENT_STATUS_FAILED,payment.getStatus()); assertEquals(CommonConstants.PAYMENT_STATUS_FAILED,order.getPaymentStatus());
+        verify(eventProducer).publishPaymentFailed(any());
+
+        payment.setStatus(CommonConstants.PAYMENT_STATUS_SUCCESS);
+        assertSame(payment,service.markRazorpayPaymentFailed(7L,1L,"ignored"));
+        verify(paymentRepository,times(1)).save(payment);
+    }
+
 }

@@ -8,12 +8,12 @@ package NarayanGroup.example.E_Commerce.constant;
 public final class CommonConstants {
     public static final String SUCCESS = "Success";
     public static final String FAILURE = "Failure";
-    public static final String FAIL = "FAIL";
-    public static final String MS_ID = "MSID";
-    public static final String CART = "CART";
-    public static final String AUTH = "AUTH";
-    public static final String RESOURCE = "RESOURCE";
-    public static final String CHECKOUT = "CHECKOUT";
+    public static final String FAILURE_STATUS = "FAIL";
+    public static final String DEFAULT_MS_ID = "MSID";
+    public static final String CART_MODULE = "CART";
+    public static final String AUTH_MODULE = "AUTH";
+    public static final String RESOURCE_MODULE = "RESOURCE";
+    public static final String CHECKOUT_MODULE = "CHECKOUT";
     public static final String ERROR_PAYLOAD_KEY = "errors";
     public static final String COD = "COD";
     public static final String RAZORPAY = "RAZORPAY";
@@ -44,7 +44,6 @@ public final class CommonConstants {
     public static final String USER_FETCHED_SUCCESSFULLY = "User fetched successfully";
     public static final String ALL_USER_DETAILS_FETCHED_SUCCESSFULLY = "All user details fetched successfully";
     public static final String OTP_SENT_SUCCESSFULLY = "OTP sent successfully";
-    public static final String OTP_VALIDATED_SUCCESSFULLY = "OTP validated successfully";
     public static final String PASSWORD_RESET_SUCCESSFULLY = "Password reset successfully";
     public static final String ORDERS_FETCHED_SUCCESSFULLY = "Orders fetched successfully";
     public static final String ORDER_FETCHED_SUCCESSFULLY = "Order fetched successfully";
@@ -60,7 +59,7 @@ public final class CommonConstants {
     public static final String PAYMENT_SUCCESSFUL_BODY = "Your payment of %s %s was successful for order %s.";
     public static final String ORDER_CANCELLED_BODY = "Your order %s has been cancelled. Reason: %s. Payment status: %s.";
     public static final String OTP_EMAIL_BODY = "Your OTP code is: %s%nThis code is valid for 10 minutes.";
-    public static final String OTP_VALIDATION_STATUS = "OTP validation status: %s";
+    public static final String OTP_VALIDATED_SUCCESSFULLY = "OTP validated successfully";
 
     private CommonConstants() {
     }

@@ -151,6 +151,8 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
         response.addHeader(HttpHeaders.SET_COOKIE, deleteCookie.toString());
         logger.info("User logged out successfully, refresh token cookie cleared");
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .build();
     }
 }

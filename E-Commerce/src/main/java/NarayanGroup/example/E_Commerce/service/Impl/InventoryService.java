@@ -105,10 +105,10 @@ public class InventoryService implements IInventoryService {
         inventory.setReservedQuantity(inventory.getReservedQuantity() - fromReservation);
         inventory.setAvailableQuantity(inventory.getAvailableQuantity() + quantity);
 
-        if (remaining > 0) {
-            Product product = inventory.getProduct();
-            int currentQuantity = product.getQuantity() == null ? 0 : product.getQuantity();
-            product.setQuantity(currentQuantity + (int) remaining);
+        Product product = inventory.getProduct();
+        if (product != null) {
+            int restoredQuantity = (int) (inventory.getAvailableQuantity() + inventory.getReservedQuantity());
+            product.setQuantity(restoredQuantity);
             productRepository.save(product);
         }
 

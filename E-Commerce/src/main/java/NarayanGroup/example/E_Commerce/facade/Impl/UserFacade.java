@@ -12,8 +12,6 @@ import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import NarayanGroup.example.E_Commerce.constant.CommonConstants;
-import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import java.util.List;
 
 @Component
@@ -82,7 +80,7 @@ public class UserFacade implements IUserFacade {
         return ResponseMessageUtilityDTO.builder()
                 .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
-                .message(CommonConstants.OTP_VALIDATION_STATUS)
+                .message(CommonConstants.OTP_VALIDATED_SUCCESSFULLY)
                 .data(response)
                 .build();
     }
