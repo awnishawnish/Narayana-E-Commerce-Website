@@ -104,6 +104,12 @@ public class ProductFacade implements IProductFacade {
                 .httpStatus(200)
                 .message(CommonConstants.PRODUCTS_FETCHED_SUCCESSFULLY)
                 .data(productResponses)
+                .page(products.getNumber())
+                .size(products.getSize())
+                .totalElements(products.getTotalElements())
+                .totalPages(products.getTotalPages())
+                .first(products.isFirst())
+                .last(products.isLast())
                 .build();
     }
 
@@ -120,6 +126,12 @@ public class ProductFacade implements IProductFacade {
                 .httpStatus(200)
                 .message(String.format(CommonConstants.SEARCH_RESULTS_FOR, keyword))
                 .data(productResponses)
+                .page(products.getNumber())
+                .size(products.getSize())
+                .totalElements(products.getTotalElements())
+                .totalPages(products.getTotalPages())
+                .first(products.isFirst())
+                .last(products.isLast())
                 .build();
     }
 
@@ -185,6 +197,12 @@ public class ProductFacade implements IProductFacade {
                 .status(CommonConstants.SUCCESS)
                 .message(CommonConstants.PRODUCTS_FETCHED_SUCCESSFULLY)
                 .data(productResponses)
+                .page(products.getNumber())
+                .size(products.getSize())
+                .totalElements(products.getTotalElements())
+                .totalPages(products.getTotalPages())
+                .first(products.isFirst())
+                .last(products.isLast())
                 .build();
     }
 }

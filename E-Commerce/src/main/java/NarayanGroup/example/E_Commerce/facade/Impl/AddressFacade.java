@@ -19,6 +19,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AddressFacade implements IAddressFacade {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AddressFacade.class);
+
     private final IAddressService addressService;
     private final IUserService userService;
 
@@ -62,7 +64,7 @@ public class AddressFacade implements IAddressFacade {
                                 request.getIsDefault()
                         )
                 )
-                .isDeleted(false)
+                //.isDeleted(false)
                 .build();
 
         Address saved =

@@ -26,6 +26,13 @@ public class LoginService implements UserDetailsService {
 
     private final IUserRepository userRepository;
 
+    public Long getUserId(String email) {
+        UserEntity user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException(ErrorConstants.USER_NOT_FOUND_WITH_EMAIL + email);
+        }
+        return user.getId();
+    }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {

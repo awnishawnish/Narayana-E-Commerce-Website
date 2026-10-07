@@ -17,6 +17,8 @@ import java.math.BigDecimal;
 public class RazorpayService
         implements IRazorpayService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(RazorpayService.class);
+
     private final RazorpayClient razorpayClient;
 
     @Override

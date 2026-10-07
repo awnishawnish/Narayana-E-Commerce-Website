@@ -7,4 +7,6 @@ public interface IPaymentService {
     Payment verifyRazorpayPayment(Long userId, PaymentVerificationRequestDTO request);
 
     Payment markRazorpayPaymentFailed(Long userId, Long orderId, String reason);
+
+    Payment savePayment(Payment payment);
 }

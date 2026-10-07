@@ -80,6 +80,21 @@ public final class ErrorConstants {
     public static final String TOKEN_INVALID = "Invalid token";
     public static final String TOKEN_EXPIRED_OR_INVALID = "Token expired or invalid";
     public static final String USER_NOT_FOUND = "User not found";
+    public static final String VENDOR_ACCESS_NOT_ALLOWED = "Vendor access is not allowed for this account";
+    public static final String SELLER_NOT_FOUND = "Seller profile not found";
+    public static final String SELLER_PROFILE_ALREADY_EXISTS = "Seller profile already exists";
+    public static final String PRODUCT_CATEGORY_NOT_FOUND = "Product category not found";
+    public static final String PREDEFINED_CATEGORY_REQUIRED_FOR_SELLER = "Seller registration requires a predefined product category";
+    public static final String ACTIVE_SELLER_NOT_FOUND = "Active seller profile not found";
+    public static final String CATEGORY_NOT_FOUND = "Category not found";
+    public static final String SUBCATEGORY_NOT_FOUND = "Subcategory not found";
+    public static final String INVALID_CATEGORY_SUBCATEGORY = "Subcategory does not belong to selected category";
+    public static final String CUSTOM_CATEGORY_ACCESS_DENIED = "You cannot use another seller's custom category";
+    public static final String CUSTOM_SUBCATEGORY_ACCESS_DENIED = "You cannot use another seller's custom subcategory";
+    public static final String AUTHENTICATED_USER_EMAIL_MISSING = "Authenticated user email is missing";
+    public static final String AUTHENTICATED_USER_NOT_FOUND = "Authenticated user not found";
+    public static final String QUANTITY_CANNOT_BE_NEGATIVE = "Quantity cannot be negative";
+    public static final String PRODUCT_NOT_FOUND_FOR_CURRENT_SELLER = "Product not found for current seller with id: ";
     public static final String UNEXPECTED_ERROR = "An unexpected error occurred: ";
     public static final String VALIDATION_FAILED = "Validation failed";
 

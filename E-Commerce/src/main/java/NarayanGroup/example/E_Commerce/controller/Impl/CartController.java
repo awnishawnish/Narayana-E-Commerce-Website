@@ -14,12 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class CartController implements ICartController {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CartController.class);
+
     private final ICartFacade iCartFacade;
 
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> addToCart(Long userId,
             AddCartRequestDTO request
     ) {
+
+        logger.info("addToCart called for userId={}", userId);
 
         ResponseMessageUtilityDTO response =
                 iCartFacade.addToCart(userId, request);
@@ -30,6 +34,8 @@ public class CartController implements ICartController {
 
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> getCart(Long userId) {
+
+        logger.info("getCart called for userId={}", userId);
 
         ResponseMessageUtilityDTO response =
                 iCartFacade.getCart(userId);
@@ -46,6 +52,8 @@ public class CartController implements ICartController {
             UpdateCartItemRequestDTO request
     ) {
 
+        logger.info("updateQuantity called for userId={} cartItemId={} delta={}", userId, cartItemId, request.getQuantity());
+
         ResponseMessageUtilityDTO response =
                 iCartFacade.updateQuantity(userId,cartItemId, request);
 
@@ -57,6 +65,8 @@ public class CartController implements ICartController {
             Long cartItemId
     ) {
 
+        logger.info("removeItem called for userId={} cartItemId={}", userId, cartItemId);
+
         ResponseMessageUtilityDTO response =
                 iCartFacade.removeItem(userId,cartItemId);
 
@@ -65,6 +75,8 @@ public class CartController implements ICartController {
 
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> clearCart(Long userId) {
+
+        logger.info("clearCart called for userId={}", userId);
 
         ResponseMessageUtilityDTO response =
                 iCartFacade.clearCart(userId);

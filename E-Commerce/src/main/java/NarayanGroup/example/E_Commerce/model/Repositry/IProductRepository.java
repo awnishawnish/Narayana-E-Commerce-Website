@@ -32,4 +32,8 @@ public interface IProductRepository
     );
 
     java.util.Optional<Product> findByIdAndIsDeletedFalse(Long id);
+
+    Page<Product> findBySellerIdAndIsDeletedFalse(Long sellerId, Pageable pageable);
+
+    java.util.Optional<Product> findByIdAndSellerIdAndIsDeletedFalse(Long id, Long sellerId);
 }

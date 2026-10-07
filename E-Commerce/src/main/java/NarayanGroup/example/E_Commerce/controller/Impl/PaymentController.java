@@ -14,6 +14,8 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @RequiredArgsConstructor
 @RequestMapping("/api/payment")
 public class PaymentController implements IPaymentController {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(PaymentController.class);
     private final IPaymentService paymentService;
 
     @PostMapping("/{userId}/verify")
@@ -21,7 +23,9 @@ public class PaymentController implements IPaymentController {
     public ResponseEntity<ResponseMessageUtilityDTO> verifyPayment(
             @PathVariable Long userId,
             @Valid @RequestBody PaymentVerificationRequestDTO request) {
+        logger.info("verifyPayment called for userId={}", userId);
         paymentService.verifyRazorpayPayment(userId, request);
+        logger.info("verifyPayment completed for userId={}", userId);
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
                 .status(CommonConstants.SUCCESS)
                 .httpStatus(200)
@@ -35,7 +39,9 @@ public class PaymentController implements IPaymentController {
             @PathVariable Long userId,
             @PathVariable Long orderId,
             @RequestParam(required = false) String reason) {
+        logger.info("paymentFailed called for userId={} orderId={} reason={}", userId, orderId, reason);
         paymentService.markRazorpayPaymentFailed(userId, orderId, reason);
+        logger.info("paymentFailed processed for userId={} orderId={}", userId, orderId);
         return ResponseEntity.ok(ResponseMessageUtilityDTO.builder()
                 .status(CommonConstants.SUCCESS)
                 .httpStatus(200)

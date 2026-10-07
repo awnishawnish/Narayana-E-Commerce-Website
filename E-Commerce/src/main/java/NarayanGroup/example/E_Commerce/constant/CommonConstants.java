@@ -60,6 +60,19 @@ public final class CommonConstants {
     public static final String ORDER_CANCELLED_BODY = "Your order %s has been cancelled. Reason: %s. Payment status: %s.";
     public static final String OTP_EMAIL_BODY = "Your OTP code is: %s%nThis code is valid for 10 minutes.";
     public static final String OTP_VALIDATED_SUCCESSFULLY = "OTP validated successfully";
+    public static final String SELLER_REGISTERED_SUCCESSFULLY = "Seller registered successfully";
+    public static final String SELLER_PROFILE_FETCHED_SUCCESSFULLY = "Seller profile fetched successfully";
+    public static final String CATEGORIES_FETCHED_SUCCESSFULLY = "Categories fetched successfully";
+    public static final String SUBCATEGORIES_FETCHED_SUCCESSFULLY = "Subcategories fetched successfully";
+    public static final String CUSTOM_CATEGORY_CREATED_SUCCESSFULLY = "Custom category created successfully";
+    public static final String CUSTOM_SUBCATEGORY_CREATED_SUCCESSFULLY = "Custom subcategory created successfully";
+    public static final String SELLER_PRODUCTS_FETCHED_SUCCESSFULLY = "Seller products fetched successfully";
+    public static final String SELLER_PRODUCT_ADDED_SUCCESSFULLY = "Seller product added successfully";
+    public static final String SELLER_PRODUCTS_ADDED_SUCCESSFULLY = "%d seller products added successfully";
+    public static final String SELLER_PRODUCT_UPDATED_SUCCESSFULLY = "Seller product updated successfully";
+    public static final String SELLER_PRODUCT_DELETED_SUCCESSFULLY = "Seller product deleted successfully";
+    public static final String VENDOR_MODE_ACTIVATED_SUCCESSFULLY = "Vendor mode activated successfully";
+    public static final String USER_MODE_ACTIVATED_SUCCESSFULLY = "User mode activated successfully";
 
     private CommonConstants() {
     }

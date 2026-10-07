@@ -48,7 +48,8 @@ class CartFacade implements ICartFacade {
             Long userId,
             AddCartRequestDTO request) {
 
-        log.debug("Starting addToCart for userId={}", userId);
+        userId = getLoggedInUserId();
+        log.debug("Starting addToCart for authenticated userId={}", userId);
 
         UserEntity user = userService.getUserById(userId);
 
@@ -269,7 +270,8 @@ class CartFacade implements ICartFacade {
     @Override
     public ResponseMessageUtilityDTO getCart(Long userId) {
 
-        log.debug("Starting getCart for userId={}", userId);
+        userId = getLoggedInUserId();
+        log.debug("Starting getCart for authenticated userId={}", userId);
 
         Cart cart = cartService.findByUserid(userId);
 
@@ -318,8 +320,9 @@ class CartFacade implements ICartFacade {
             Long cartItemId,
             UpdateCartItemRequestDTO request) {
 
+        userId = getLoggedInUserId();
         log.debug(
-                "Starting updateQuantity. userId={}, cartItemId={}",
+                "Starting updateQuantity. authenticatedUserId={}, cartItemId={}",
                 userId,
                 cartItemId
         );
@@ -460,8 +463,9 @@ class CartFacade implements ICartFacade {
             Long userId,
             Long cartItemId) {
 
+        userId = getLoggedInUserId();
         log.debug(
-                "Starting removeItem. userId={}, cartItemId={}",
+                "Starting removeItem. authenticatedUserId={}, cartItemId={}",
                 userId,
                 cartItemId
         );
@@ -561,7 +565,8 @@ class CartFacade implements ICartFacade {
     @Override
     public ResponseMessageUtilityDTO clearCart(Long userId) {
 
-        log.debug("Starting clearCart for userId={}", userId);
+        userId = getLoggedInUserId();
+        log.debug("Starting clearCart for authenticated userId={}", userId);
 
         Cart cart = cartService.findByUserid(userId);
 

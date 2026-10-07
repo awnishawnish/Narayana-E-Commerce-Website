@@ -10,4 +10,5 @@ public interface IOrderService {
     void cancelOrder(Long userId, Long orderId, String reason);
     byte[] generateInvoice(Long userId, Long orderId);
     void expirePendingPayment(Long orderId);
+    NarayanGroup.example.E_Commerce.model.Entity.Order saveOrder(NarayanGroup.example.E_Commerce.model.Entity.Order order);
 }

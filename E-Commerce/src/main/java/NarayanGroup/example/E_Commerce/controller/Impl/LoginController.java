@@ -1,4 +1,4 @@
-package NarayanGroup.example.E_Commerce.controller;
+package NarayanGroup.example.E_Commerce.controller.Impl;
 
 import NarayanGroup.example.E_Commerce.DTO.request.LoginDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.LoginResponseDTO;
@@ -9,10 +9,11 @@ import NarayanGroup.example.E_Commerce.model.Entity.UserEntity;
 import NarayanGroup.example.E_Commerce.model.Repositry.IUserRepository;
 import NarayanGroup.example.E_Commerce.security.JwtUtil;
 import NarayanGroup.example.E_Commerce.service.Impl.LoginService;
+import NarayanGroup.example.E_Commerce.service.ISellerService;
+import NarayanGroup.example.E_Commerce.model.Enum.Role;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/login")
 public class LoginController {
 
@@ -54,6 +54,25 @@ public class LoginController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ISellerService sellerService;
+
+    public LoginController(
+            IUserFacade iUserFacade,
+            AuthenticationManager authenticationManager,
+            LoginService loginService,
+            JwtUtil jwtUtil,
+            IUserRepository userRepositry,
+            PasswordEncoder passwordEncoder
+    ) {
+        this.iUserFacade = iUserFacade;
+        this.authenticationManager = authenticationManager;
+        this.loginService = loginService;
+        this.jwtUtil = jwtUtil;
+        this.userRepositry = userRepositry;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @PostMapping("/login")
     public ResponseEntity<ResponseMessageUtilityDTO> authenticateUser(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
@@ -85,9 +104,12 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
         LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
+                .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .role(user.getRole())
+                .activeRole(user.getRole())
+                .seller(sellerService != null && sellerService.isActiveSeller(user.getId()))
                 .build();
 
 
@@ -123,7 +145,16 @@ UserEntity user = (UserEntity) responseMessageUtilityDTO.getData();
             UserDetails userDetails = loginService.loadUserByUsername(username);
 
             if (jwtUtil.validateToken(refreshToken, userDetails)) {
-                String newAccessToken = jwtUtil.generateAccessToken(userDetails);
+                String activeRole = jwtUtil.getActiveRoleFromToken(refreshToken);
+                String newAccessToken;
+                if (activeRole == null || activeRole.isBlank()) {
+                    newAccessToken = jwtUtil.generateAccessToken(userDetails);
+                } else {
+                    newAccessToken = jwtUtil.generateAccessToken(
+                            userDetails,
+                            Role.valueOf(activeRole)
+                    );
+                }
                 Map<String, String> response = new HashMap<>();
                 response.put("accessToken", newAccessToken);
                 logger.info("Refresh token validated, new access token issued for user: {}", username);

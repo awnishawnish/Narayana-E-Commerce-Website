@@ -25,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Order {
+public class Order extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -138,14 +138,6 @@ public class Order {
     @Column(name = "shipping_pincode", nullable = false)
     private String shippingPincode;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
 
     @Builder.Default
     @OneToMany(
@@ -155,20 +147,4 @@ public class Order {
     )
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @PrePersist
-    protected void onCreate() {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        createdAt = now;
-        updatedAt = now;
-
-        isDeleted = false;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-
-        updatedAt = LocalDateTime.now();
-    }
 }

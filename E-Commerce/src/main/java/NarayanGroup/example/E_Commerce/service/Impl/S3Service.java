@@ -18,6 +18,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class S3Service implements IS3Service {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(S3Service.class);
+
     private final S3Client s3Client;
 
     @Value("${aws.s3.bucket}")

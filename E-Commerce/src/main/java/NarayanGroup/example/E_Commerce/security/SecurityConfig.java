@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,42 +34,28 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/user",
+                                "/api/user/**",
+                                "/api/product",
+                                "/api/product/**",
+                                "/login/**",
+                                "/api/checkout/**",
+                                "/api/address/**",
+                                "/api/order/**",
+                                "/api/payment/**",
+                                "/api/inventory/**",
+                                "/api/category/**"
 
-                        .requestMatchers("/api/user",
-                                "/api/user/**","/api/product",
-                                "/api/product/**","/login/**","/api/userId/cart","/api/userId/cart/**","/api/checkout/**","/api/address/**","/api/order/**","/api/payment/**","/api/inventory/**")
-                        .permitAll()
+                        ).permitAll()
+                        .requestMatchers("/api/seller/register").hasAuthority("USER")
+                        .requestMatchers("/api/seller/switch").hasAuthority("USER")
+                        .requestMatchers("/api/seller/switch-to-user").hasAuthority("VENDOR")
+                        .requestMatchers("/api/seller/profile").hasAnyAuthority("USER", "VENDOR")
+                        .requestMatchers("/api/category/custom", "/api/category/*/custom-subcategory").hasAuthority("VENDOR")
+                        .requestMatchers("/api/vendor/**").hasAuthority("VENDOR")
                         .anyRequest().authenticated()
                 )
-
-//                        .requestMatchers("/login", "/refresh-token", "/logout").permitAll()
-//
-//                        .requestMatchers("/api/user/**",
-//                                "/api/usergenerateOtp",
-//                                "/api/user/verify-otp",
-//                                "/api/user/resetPassword",
-//                                "/api/user/saveUserDetails").permitAll()
-//
-//                        .requestMatchers("/oauth2/**",
-//                                "/api/user/google",
-//                                "/api/user/login-failure").permitAll()
-//
-//
-//                                .requestMatchers("api/product/**").permitAll()
-
-//                        .requestMatchers("/api/product/add",
-//                                "/api/product/add-bulk",
-//                                "/api/product/update/**",
-//                                "/api/product/delete/**").hasAuthority("ADMIN")
-//
-//                        .requestMatchers("/api/product/*/quantity").hasAuthority("ADMIN")
-//
-//                        .requestMatchers("/api/product/all",
-//                                "/api/product/search",
-//                                "/api/product/**").hasAnyAuthority("USER", "ADMIN")
-//
-//                        .requestMatchers("/api/user/all").hasAuthority("ADMIN")
-
 
                 .sessionManagement(sess ->
                         sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

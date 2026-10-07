@@ -36,6 +36,9 @@ public class UserEntity {
     @Column(name = "reset_password")
     private String resetPassword;
 
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    private Seller seller;
+
 }
 
 

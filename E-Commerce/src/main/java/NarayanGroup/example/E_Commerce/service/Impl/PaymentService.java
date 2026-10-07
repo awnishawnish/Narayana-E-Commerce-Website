@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PaymentService implements IPaymentService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(PaymentService.class);
+
     private final IPaymentRepository paymentRepository;
     private final IOrderRepository orderRepository;
     private final DomainEventProducer eventProducer;
@@ -39,6 +41,12 @@ public class PaymentService implements IPaymentService {
 
     @Value("${razorpay.key-secret}")
     private String razorpayKeySecret;
+
+    @Override
+    @Transactional
+    public Payment savePayment(Payment payment) {
+        return paymentRepository.save(payment);
+    }
 
     @Override
     @Transactional

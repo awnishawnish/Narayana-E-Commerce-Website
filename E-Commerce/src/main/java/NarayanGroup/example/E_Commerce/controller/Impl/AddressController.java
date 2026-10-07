@@ -15,12 +15,16 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @AllArgsConstructor
 public class AddressController implements IAddressController {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AddressController.class);
+
     private final IAddressFacade addressFacade;
 
     @Override
     public ResponseEntity<ResponseMessageUtilityDTO> addAddress(
             Long userId,
             AddressRequestDTO request) {
+
+        logger.info("addAddress called for userId={}", userId);
 
         return ResponseEntity
                 .status(201)
@@ -36,6 +40,8 @@ public class AddressController implements IAddressController {
     public ResponseEntity<ResponseMessageUtilityDTO> getAddresses(
             Long userId) {
 
+        logger.info("getAddresses called for userId={}", userId);
+
         return ResponseEntity.ok(
                 addressFacade.getAddresses(userId)
         );
@@ -46,6 +52,8 @@ public class AddressController implements IAddressController {
             Long userId,
             Long addressId,
             AddressRequestDTO request) {
+
+        logger.info("updateAddress called for userId={} addressId={}", userId, addressId);
 
         return ResponseEntity.ok(
                 addressFacade.updateAddress(
@@ -60,6 +68,8 @@ public class AddressController implements IAddressController {
     public ResponseEntity<ResponseMessageUtilityDTO> deleteAddress(
             Long userId,
             Long addressId) {
+
+        logger.info("deleteAddress called for userId={} addressId={}", userId, addressId);
 
         return ResponseEntity.ok(
                 addressFacade.deleteAddress(

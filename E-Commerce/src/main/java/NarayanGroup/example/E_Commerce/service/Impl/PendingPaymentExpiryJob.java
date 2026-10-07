@@ -14,6 +14,8 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 public class PendingPaymentExpiryJob {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(PendingPaymentExpiryJob.class);
     private final IOrderRepository orderRepository;
     private final OrderService orderService;
 

@@ -11,6 +11,8 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @AllArgsConstructor
 public class InventoryFacade implements IInventoryFacade {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(InventoryFacade.class);
+
     private final IInventoryService inventoryService;
 
     @Override

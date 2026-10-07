@@ -20,6 +20,10 @@ public class ProductResponseDTO {
     private String title;
     private String name;
     private String category;
+    private Long categoryId;
+    private String subcategory;
+    private Long subcategoryId;
+    private Long sellerId;
     private BigDecimal price;
     private Integer quantity;
     private String currency;

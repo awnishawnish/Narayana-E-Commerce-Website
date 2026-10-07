@@ -23,6 +23,10 @@ public class ProductRequestDTO {
     @NotBlank(message = ErrorConstants.CATEGORY_REQUIRED)
     private String category;
 
+    private Long categoryId;
+
+    private Long subcategoryId;
+
     @NotNull(message = ErrorConstants.PRICE_REQUIRED)
     @Positive(message = ErrorConstants.PRICE_MUST_BE_POSITIVE)
     private BigDecimal price;

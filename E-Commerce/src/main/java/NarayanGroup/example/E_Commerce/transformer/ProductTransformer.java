@@ -4,10 +4,8 @@ import NarayanGroup.example.E_Commerce.DTO.request.ProductRequestDTO;
 import NarayanGroup.example.E_Commerce.DTO.response.ProductResponseDTO;
 import NarayanGroup.example.E_Commerce.model.Entity.Product;
 import NarayanGroup.example.E_Commerce.service.IS3Service;
-import io.lettuce.core.dynamic.annotation.CommandNaming;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @AllArgsConstructor
@@ -18,7 +16,21 @@ public class ProductTransformer {
         return ProductResponseDTO.builder()
                 .id(product.getId())
                 .title(product.getTitle())
-                .category(product.getCategory())
+                .category(product.getCategoryEntity() != null
+                        ? product.getCategoryEntity().getName()
+                        : product.getCategory())
+                .categoryId(product.getCategoryEntity() != null
+                        ? product.getCategoryEntity().getId()
+                        : null)
+                .subcategory(product.getSubcategory() != null
+                        ? product.getSubcategory().getName()
+                        : null)
+                .subcategoryId(product.getSubcategory() != null
+                        ? product.getSubcategory().getId()
+                        : null)
+                .sellerId(product.getSeller() != null
+                        ? product.getSeller().getId()
+                        : null)
                 .name(product.getName())
                 .price(product.getPrice())
                 .quantity(product.getQuantity())
@@ -26,8 +38,9 @@ public class ProductTransformer {
                 .imageKey(s3Service.getImageUrl(product.getImageKey()))
                 .build();
     }
-    public Product toEntity(String  image, ProductRequestDTO request) {
-        Product product = Product.builder()
+
+    public Product toEntity(String image, ProductRequestDTO request) {
+        return Product.builder()
                 .name(request.getName())
                 .title(request.getTitle())
                 .category(request.getCategory())
@@ -37,6 +50,5 @@ public class ProductTransformer {
                 .imageKey(image)
                 .isDeleted(false)
                 .build();
-        return product;
     }
 }

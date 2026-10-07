@@ -15,6 +15,8 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @AllArgsConstructor
 public class InventoryService implements IInventoryService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(InventoryService.class);
+
     private final IInventoryRepository inventoryRepository;
     private final IProductRepository productRepository;
 

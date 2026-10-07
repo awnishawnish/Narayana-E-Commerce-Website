@@ -145,7 +145,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.ImageNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<ResponseMessageUtilityDTO> ImageNotFoundException(NoResourceFoundException ex) {
+    public ResponseEntity<ResponseMessageUtilityDTO> ImageNotFoundException(CustomException.ImageNotFoundException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
                 CommonConstants.FAILURE_STATUS,
                 HttpStatus.NOT_FOUND.value(),
@@ -159,7 +159,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.ProductNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<ResponseMessageUtilityDTO> ProductNotFoundException(NoResourceFoundException ex) {
+    public ResponseEntity<ResponseMessageUtilityDTO> ProductNotFoundException(CustomException.ProductNotFoundException ex) {
         ResponseMessageUtilityDTO message = new ResponseMessageUtilityDTO(
                 CommonConstants.FAILURE_STATUS,
                 HttpStatus.NOT_FOUND.value(),

@@ -36,6 +36,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrderService implements IOrderService {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(OrderService.class);
     private final IOrderRepository orderRepository;
     private final IPaymentRepository paymentRepository;
     private final IRazorpayService razorpayService;
@@ -43,6 +45,12 @@ public class OrderService implements IOrderService {
 
     @Value("${app.checkout.payment-timeout-minutes:15}")
     private long paymentTimeoutMinutes;
+
+    @Override
+    @Transactional
+    public Order saveOrder(Order order) {
+        return orderRepository.save(order);
+    }
 
     @Override
     @Transactional(readOnly = true)

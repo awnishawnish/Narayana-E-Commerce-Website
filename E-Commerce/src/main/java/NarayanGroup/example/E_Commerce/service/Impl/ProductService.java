@@ -46,6 +46,9 @@ public class ProductService implements IProductService {
                         .quantity(request.getQuantity())
                         .currency(request.getCurrency())
                         .imageKey(request.getImageKey())
+                        .seller(request.getSeller())
+                        .categoryEntity(request.getCategoryEntity())
+                        .subcategory(request.getSubcategory())
                         .isDeleted(false)
                         .build())
                 .collect(Collectors.toList());

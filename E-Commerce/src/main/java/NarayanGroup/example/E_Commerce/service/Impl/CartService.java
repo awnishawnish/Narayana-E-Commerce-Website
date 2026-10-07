@@ -13,6 +13,8 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @AllArgsConstructor
 public class CartService implements ICartService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CartService.class);
+
     private final ICartRepository cartRepository;
     private final ICartItemRepository cartItemRepository;
 

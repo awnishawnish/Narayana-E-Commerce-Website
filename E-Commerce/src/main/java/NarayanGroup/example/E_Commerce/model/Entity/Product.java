@@ -48,4 +48,15 @@ public class Product {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category categoryEntity;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategory_id")
+    private Subcategory subcategory;
 }

@@ -13,8 +13,6 @@ import NarayanGroup.example.E_Commerce.kafka.producer.DomainEventProducer;
 import NarayanGroup.example.E_Commerce.facade.ICheckoutFacade;
 import NarayanGroup.example.E_Commerce.model.Entity.*;
 import NarayanGroup.example.E_Commerce.model.Enum.OrderStatus;
-import NarayanGroup.example.E_Commerce.model.Repositry.IOrderRepository;
-import NarayanGroup.example.E_Commerce.model.Repositry.IPaymentRepository;
 import NarayanGroup.example.E_Commerce.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,13 +30,15 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class CheckoutFacade implements ICheckoutFacade {
+
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CheckoutFacade.class);
     private final ICartService cartService;
     private final IAddressService addressService;
     private final IInventoryService inventoryService;
     private final IUserService userService;
     private final IProductService productService;
-    private final IOrderRepository orderRepository;
-    private final IPaymentRepository paymentRepository;
+    private final IOrderService orderService;
+    private final IPaymentService paymentService;
     private final IRazorpayService razorpayService;
     private final RazorpayConfig razorpayConfig;
     private final DomainEventProducer eventProducer;
@@ -407,7 +407,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                                 address.getPincode()
                         )
 
-                        .isDeleted(false)
+                      //  .isDeleted(false)
 
                         .build();
 
@@ -463,7 +463,7 @@ public class CheckoutFacade implements ICheckoutFacade {
                                     product.getCurrency()
                             )
 
-                            .isDeleted(false)
+                           // .isDeleted(false)
 
                             .build();
 
@@ -480,7 +480,7 @@ public class CheckoutFacade implements ICheckoutFacade {
          */
 
         Order savedOrder =
-                orderRepository.save(order);
+                orderService.saveOrder(order);
 
 
         /*
@@ -568,12 +568,12 @@ public class CheckoutFacade implements ICheckoutFacade {
                                 CommonConstants.PAYMENT_STATUS_PENDING
                         )
 
-                        .isDeleted(false)
+                       // .isDeleted(false)
 
                         .build();
 
 
-        paymentRepository.save(payment);
+        paymentService.savePayment(payment);
 
 
         /*

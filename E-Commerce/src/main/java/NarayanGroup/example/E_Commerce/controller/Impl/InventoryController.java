@@ -12,11 +12,15 @@ import org.springframework.web.bind.annotation.*;
 @AllArgsConstructor
 public class InventoryController implements IInventoryController {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(InventoryController.class);
+
     private final IInventoryFacade inventoryFacade;
 
 
     public ResponseEntity<Inventory> findByProductId(
             @PathVariable Long productId) {
+
+        logger.info("findByProductId called for productId={}", productId);
 
         return ResponseEntity.ok(
                 inventoryFacade.findByProductId(productId)
@@ -26,6 +30,8 @@ public class InventoryController implements IInventoryController {
 
     public ResponseEntity<Inventory> save(
             @RequestBody Inventory inventory) {
+
+        // logger.info("save inventory called for productId={}", inventory.getProductId());
 
         Inventory savedInventory =
                 inventoryFacade.save(inventory);

@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class AddressService implements IAddressService {
 
+    private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(AddressService.class);
+
     private final IAddressRepository addressRepository;
 
     @Override

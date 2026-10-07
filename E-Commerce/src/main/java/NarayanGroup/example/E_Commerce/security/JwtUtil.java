@@ -1,10 +1,12 @@
 package NarayanGroup.example.E_Commerce.security;
 
+import NarayanGroup.example.E_Commerce.model.Enum.Role;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +19,9 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    public static final long ACCESS_TOKEN_VALIDITY  = 15 * 60 * 1000;           // 15 minutes
-    public static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000L; // 7 days
+    public static final long ACCESS_TOKEN_VALIDITY = 15 * 60 * 1000;
+    public static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000L;
+    public static final String ACTIVE_ROLE_CLAIM = "activeRole";
 
     private final Key secretKey;
 
@@ -28,6 +31,10 @@ public class JwtUtil {
 
     public String getUsernameFromToken(String token) {
         return getClaimFromToken(token, Claims::getSubject);
+    }
+
+    public String getActiveRoleFromToken(String token) {
+        return getClaimFromToken(token, claims -> claims.get(ACTIVE_ROLE_CLAIM, String.class));
     }
 
     public Date getExpirationDateFromToken(String token) {
@@ -52,14 +59,32 @@ public class JwtUtil {
     }
 
     public String generateAccessToken(UserDetails userDetails) {
+        Role activeRole = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Role::valueOf)
+                .findFirst()
+                .orElse(Role.USER);
+        return generateAccessToken(userDetails, activeRole);
+    }
+
+    public String generateAccessToken(UserDetails userDetails, Role activeRole) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", userDetails.getAuthorities());
+        claims.put(ACTIVE_ROLE_CLAIM, activeRole.name());
         return doGenerateToken(claims, userDetails.getUsername(), ACCESS_TOKEN_VALIDITY);
     }
 
     public String generateRefreshToken(UserDetails userDetails) {
+        Role activeRole = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .map(Role::valueOf)
+                .findFirst()
+                .orElse(Role.USER);
+        return generateRefreshToken(userDetails, activeRole);
+    }
+
+    public String generateRefreshToken(UserDetails userDetails, Role activeRole) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", userDetails.getAuthorities());
+        claims.put(ACTIVE_ROLE_CLAIM, activeRole.name());
         return doGenerateToken(claims, userDetails.getUsername(), REFRESH_TOKEN_VALIDITY);
     }
 
@@ -75,6 +100,6 @@ public class JwtUtil {
 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 }

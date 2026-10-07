@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address {
+public class Address extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,29 +50,5 @@ public class Address {
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
 
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        createdAt = now;
-        updatedAt = now;
-
-        isDeleted = false;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-
-        updatedAt = LocalDateTime.now();
-    }
 }
