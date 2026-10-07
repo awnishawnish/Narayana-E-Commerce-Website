@@ -27,8 +27,8 @@ class CheckoutFacadeTest {
     @Mock IInventoryService inventoryService;
     @Mock IUserService userService;
     @Mock IProductService productService;
-    @Mock IOrderRepository orderRepository;
-    @Mock IPaymentRepository paymentRepository;
+    @Mock IOrderService orderService;
+    @Mock IPaymentService paymentService;
     @Mock IRazorpayService razorpayService;
     @Mock RazorpayConfig razorpayConfig;
     @Mock DomainEventProducer eventProducer;
@@ -36,7 +36,7 @@ class CheckoutFacadeTest {
 
     @BeforeEach void setUp() {
         facade = new CheckoutFacade(cartService, addressService, inventoryService, userService, productService,
-                orderRepository, paymentRepository, razorpayService, razorpayConfig, eventProducer);
+                orderService, paymentService, razorpayService, razorpayConfig, eventProducer);
     }
 
     @Test void checkout_shouldRejectInvalidPaymentMethod() {
@@ -59,12 +59,12 @@ class CheckoutFacadeTest {
         when(addressService.findActiveAddress(3L, 1L)).thenReturn(address);
         when(productService.getProductById(10L)).thenReturn(product);
         when(inventoryService.reserveStock(10L, 2L)).thenReturn(Inventory.builder().build());
-        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+        when(orderService.saveOrder(any(Order.class))).thenAnswer(invocation -> {
             Order order = invocation.getArgument(0);
             order.setId(100L);
             return order;
         });
-        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(paymentService.savePayment(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CheckoutRequestDTO request = CheckoutRequestDTO.builder().addressId(3L).paymentMethod(CommonConstants.COD).build();
         var response = facade.checkout(1L, request);

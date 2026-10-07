@@ -64,3 +64,19 @@ aws:
   region: ${AWS_REGION:eu-north-1}
   s3:
     bucket: ${AWS_S3_BUCKET}
+
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
+# Kafka
+app:
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    topics:
+      payment-successful: ${KAFKA_PAYMENT_SUCCESSFUL_TOPIC:payment-successful}
+      payment-failed: ${KAFKA_PAYMENT_FAILED_TOPIC:payment-failed}
+      order-confirmed: ${KAFKA_ORDER_CONFIRMED_TOPIC:order-confirmed}
+      order-cancelled: ${KAFKA_ORDER_CANCELLED_TOPIC:order-cancelled}
+  checkout:
+    payment-timeout-minutes: ${CHECKOUT_PAYMENT_TIMEOUT_MINUTES:15}
+    payment-expiry-check-ms: ${CHECKOUT_PAYMENT_EXPIRY_CHECK_MS:300000}

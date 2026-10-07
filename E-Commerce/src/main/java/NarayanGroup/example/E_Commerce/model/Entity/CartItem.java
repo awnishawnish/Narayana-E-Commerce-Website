@@ -2,6 +2,7 @@ package NarayanGroup.example.E_Commerce.model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
@@ -11,8 +12,8 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class CartItem {
+@SuperBuilder
+public class CartItem extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +47,4 @@ public class CartItem {
     @Column(name = "currency", nullable = false, length = 10)
     private String currency;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
 }

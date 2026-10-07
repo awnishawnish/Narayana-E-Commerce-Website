@@ -1,0 +1,16 @@
+.git
+.gitignore
+.idea
+.vscode
+
+target/*
+!target/E-Commerce-0.0.1-SNAPSHOT.jar
+
+src
+.mvn
+
+*.log
+*.zip
+
+README.md
+HELP.md

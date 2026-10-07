@@ -4,6 +4,7 @@ package NarayanGroup.example.E_Commerce.model.Entity;
 import NarayanGroup.example.E_Commerce.model.Enum.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Order extends BaseEntity {
 
     @Id

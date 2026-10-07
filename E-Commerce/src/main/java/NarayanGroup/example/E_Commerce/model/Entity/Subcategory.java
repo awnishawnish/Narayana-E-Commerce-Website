@@ -2,6 +2,7 @@ package NarayanGroup.example.E_Commerce.model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "subcategory")
@@ -9,8 +10,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Subcategory {
+@SuperBuilder
+public class Subcategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +34,4 @@ public class Subcategory {
     @JoinColumn(name = "seller_id")
     private Seller seller;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
 }

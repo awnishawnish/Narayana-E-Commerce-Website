@@ -4,6 +4,7 @@ import NarayanGroup.example.E_Commerce.model.Enum.BusinessType;
 import NarayanGroup.example.E_Commerce.model.Enum.SellerStatus;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "seller")
@@ -11,8 +12,8 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Seller {
+@SuperBuilder
+public class Seller extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +47,4 @@ public class Seller {
     @Column(name = "status", nullable = false)
     private SellerStatus status;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
 }

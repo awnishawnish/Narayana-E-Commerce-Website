@@ -31,8 +31,7 @@ class OrderServiceTest {
                 .paymentStatus(paymentStatus).subtotal(new BigDecimal("100")).tax(BigDecimal.ZERO).deliveryCharge(BigDecimal.ZERO)
                 .discount(BigDecimal.ZERO).totalAmount(new BigDecimal("100")).currency("INR")
                 .shippingFullName("User").shippingPhone("9876543210").shippingAddressLine1("Line")
-                .shippingCity("Noida").shippingState("UP").shippingPincode("201301")
-                .createdAt(LocalDateTime.now().minusHours(1)).updatedAt(LocalDateTime.now()).orderItems(new java.util.ArrayList<>()).build();
+                .shippingCity("Noida").shippingState("UP").shippingPincode("201301").build();
         o.getOrderItems().add(OrderItem.builder().id(1L).order(o).product(product).productTitle("Phone").quantity(1L)
                 .unitPrice(new BigDecimal("100")).totalPrice(new BigDecimal("100")).currency("INR").build());
         return o;

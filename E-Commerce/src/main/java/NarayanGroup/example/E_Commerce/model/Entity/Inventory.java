@@ -3,6 +3,7 @@ package NarayanGroup.example.E_Commerce.model.Entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
@@ -20,8 +21,8 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Inventory {
+@SuperBuilder
+public class Inventory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,24 +48,10 @@ public class Inventory {
     )
     private Long reservedQuantity;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean isDeleted;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    private LocalDateTime updatedAt;
+    // createdAt/updatedAt/isDeleted are inherited from BaseEntity
 
     @PrePersist
     protected void onCreate() {
-
-        LocalDateTime now = LocalDateTime.now();
-
-        createdAt = now;
-        updatedAt = now;
-
-        isDeleted = false;
 
         if (availableQuantity == null) {
             availableQuantity = 0L;
@@ -77,7 +64,6 @@ public class Inventory {
 
     @PreUpdate
     protected void onUpdate() {
-
-        updatedAt = LocalDateTime.now();
+        // updatedAt handled by BaseEntity
     }
 }
