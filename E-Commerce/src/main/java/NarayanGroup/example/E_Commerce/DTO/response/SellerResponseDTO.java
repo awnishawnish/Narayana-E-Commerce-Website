@@ -17,6 +17,8 @@ public class SellerResponseDTO {
     private boolean mobileVerified;
     private BusinessType businessType;
     private String businessAddress;
+    private Double latitude;
+    private Double longitude;
     private Long productCategoryId;
     private String productCategoryName;
     private SellerStatus status;

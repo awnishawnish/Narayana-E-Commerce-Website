@@ -21,5 +21,8 @@ public class OrderConfirmedEvent {
     private String currency;
     private Long userId;
     private String userEmail;
+    private String shippingAddress;
+    private String shippingPhone;
+    private List<String> sellerEmails;
     private List<PaymentItemEvent> items;
 }

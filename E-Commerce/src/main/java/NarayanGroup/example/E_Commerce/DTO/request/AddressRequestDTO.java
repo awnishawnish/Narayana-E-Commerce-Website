@@ -44,6 +44,20 @@ public class AddressRequestDTO {
     )
     private String pincode;
 
+    // Optional GPS coordinates captured with the user's permission.
+    @jakarta.validation.constraints.DecimalMin(value = "-90.0")
+    @jakarta.validation.constraints.DecimalMax(value = "90.0")
+    private Double latitude;
+
+    @jakarta.validation.constraints.DecimalMin(value = "-180.0")
+    @jakarta.validation.constraints.DecimalMax(value = "180.0")
+    private Double longitude;
+
     // Optional
     private Boolean isDefault;
+
+    @jakarta.validation.constraints.AssertTrue(message = "Latitude and longitude must be provided together")
+    public boolean isCoordinatesPairValid() {
+        return (latitude == null) == (longitude == null);
+    }
 }

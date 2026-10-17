@@ -62,6 +62,10 @@ public class CartTransformer {
                                         item.getProduct().getImageKey()
                                 )
                         )
+                        .sellerLatitude(item.getProduct().getSeller() == null
+                                ? null : item.getProduct().getSeller().getLatitude())
+                        .sellerLongitude(item.getProduct().getSeller() == null
+                                ? null : item.getProduct().getSeller().getLongitude())
                         .build();
 
 

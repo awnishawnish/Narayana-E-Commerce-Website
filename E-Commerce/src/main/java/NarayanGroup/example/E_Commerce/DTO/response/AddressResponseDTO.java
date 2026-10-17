@@ -27,5 +27,9 @@ public class AddressResponseDTO {
 
     private String pincode;
 
+    private Double latitude;
+
+    private Double longitude;
+
     private boolean isDefault;
 }

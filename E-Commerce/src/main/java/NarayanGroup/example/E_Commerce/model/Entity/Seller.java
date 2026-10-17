@@ -38,7 +38,11 @@ public class Seller extends BaseEntity {
 
     @Column(name = "business_address", nullable = false, length = 1000)
     private String businessAddress;
+    @Column(name = "latitude")
+    private Double latitude;
 
+    @Column(name = "longitude")
+    private Double longitude;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_category_id")
     private Category productCategory;

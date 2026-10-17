@@ -115,6 +115,15 @@ public class Order extends BaseEntity {
     )
     private String currency;
 
+    @Column(name = "assigned_delivery_partner_id")
+    private Long assignedDeliveryPartnerId;
+
+    @Column(name = "cod_collected_at")
+    private LocalDateTime codCollectedAt;
+
+    @Column(name = "cod_collected_by_id")
+    private Long codCollectedById;
+
     /*
      * Shipping address snapshot
      */

@@ -48,6 +48,12 @@ public class Address extends BaseEntity {
     @Column(name = "pincode", nullable = false, length = 10)
     private String pincode;
 
+    @Column(name = "latitude")
+    private Double latitude;
+
+    @Column(name = "longitude")
+    private Double longitude;
+
     @Column(name = "is_default", nullable = false)
     private boolean isDefault;
 

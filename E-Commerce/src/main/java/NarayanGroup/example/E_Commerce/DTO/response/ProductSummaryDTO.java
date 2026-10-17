@@ -23,4 +23,8 @@ public class ProductSummaryDTO {
 
     private String imageKey;
 
+    private Double sellerLatitude;
+
+    private Double sellerLongitude;
+
 }

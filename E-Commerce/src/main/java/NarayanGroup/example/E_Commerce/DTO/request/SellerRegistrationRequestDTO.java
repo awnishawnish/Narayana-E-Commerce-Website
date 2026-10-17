@@ -27,4 +27,17 @@ public class SellerRegistrationRequestDTO {
 
     @NotNull
     private Long productCategoryId;
+
+    @jakarta.validation.constraints.DecimalMin(value = "-90.0")
+    @jakarta.validation.constraints.DecimalMax(value = "90.0")
+    private Double latitude;
+
+    @jakarta.validation.constraints.DecimalMin(value = "-180.0")
+    @jakarta.validation.constraints.DecimalMax(value = "180.0")
+    private Double longitude;
+
+    @jakarta.validation.constraints.AssertTrue(message = "Latitude and longitude must be provided together")
+    public boolean isCoordinatesPairValid() {
+        return (latitude == null) == (longitude == null);
+    }
 }

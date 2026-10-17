@@ -55,6 +55,8 @@ public class SellerService implements ISellerService {
                 .mobileVerified(false)
                 .businessType(request.getBusinessType())
                 .businessAddress(request.getBusinessAddress())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .productCategory(category)
                 .status(SellerStatus.ACTIVE)
                 .isDeleted(false)

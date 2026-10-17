@@ -207,7 +207,7 @@ public class OrderService implements IOrderService {
                 .shippingFullName(order.getShippingFullName()).shippingPhone(order.getShippingPhone())
                 .shippingAddressLine1(order.getShippingAddressLine1()).shippingAddressLine2(order.getShippingAddressLine2())
                 .shippingCity(order.getShippingCity()).shippingState(order.getShippingState()).shippingPincode(order.getShippingPincode())
-                .createdAt(order.getCreatedAt()).updatedAt(order.getUpdatedAt())
+                .createdAt(order.getCreatedAt()).updatedAt(order.getUpdatedAt()).codCollectedAt(order.getCodCollectedAt())
                 .items(order.getOrderItems().stream().map(item -> OrderItemResponseDTO.builder()
                         .id(item.getId()).productId(item.getProduct().getId()).productTitle(item.getProductTitle())
                         .quantity(item.getQuantity()).unitPrice(item.getUnitPrice()).totalPrice(item.getTotalPrice()).currency(item.getCurrency()).build())

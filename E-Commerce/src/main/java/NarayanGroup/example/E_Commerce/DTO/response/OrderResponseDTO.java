@@ -32,6 +32,7 @@ public class OrderResponseDTO {
     private String shippingCity;
     private String shippingState;
     private String shippingPincode;
+    private LocalDateTime codCollectedAt;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<OrderItemResponseDTO> items;

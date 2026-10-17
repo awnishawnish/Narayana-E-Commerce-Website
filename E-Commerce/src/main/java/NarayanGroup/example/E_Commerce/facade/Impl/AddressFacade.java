@@ -59,6 +59,8 @@ public class AddressFacade implements IAddressFacade {
                 .city(request.getCity())
                 .state(request.getState())
                 .pincode(request.getPincode())
+                .latitude(request.getLatitude())
+                .longitude(request.getLongitude())
                 .isDefault(
                         Boolean.TRUE.equals(
                                 request.getIsDefault()
@@ -130,6 +132,8 @@ public class AddressFacade implements IAddressFacade {
         address.setCity(request.getCity());
         address.setState(request.getState());
         address.setPincode(request.getPincode());
+        address.setLatitude(request.getLatitude());
+        address.setLongitude(request.getLongitude());
 
         if (request.getIsDefault() != null) {
             address.setDefault(
@@ -180,6 +184,8 @@ public class AddressFacade implements IAddressFacade {
                 .city(address.getCity())
                 .state(address.getState())
                 .pincode(address.getPincode())
+                .latitude(address.getLatitude())
+                .longitude(address.getLongitude())
                 .isDefault(address.isDefault())
                 .build();
     }

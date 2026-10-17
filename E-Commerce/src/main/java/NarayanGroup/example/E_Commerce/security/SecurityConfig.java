@@ -48,6 +48,8 @@ public class SecurityConfig {
                                 "/api/category/**"
 
                         ).permitAll()
+                        .requestMatchers("/api/delivery/orders/*/assign/*").hasAuthority("ADMIN")
+                        .requestMatchers("/api/delivery/orders/*/cod-collected").hasAuthority("DELIVERY_PARTNER")
                         .requestMatchers("/api/seller/register").hasAuthority("USER")
                         .requestMatchers("/api/seller/switch").hasAuthority("USER")
                         .requestMatchers("/api/seller/switch-to-user").hasAuthority("VENDOR")

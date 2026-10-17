@@ -49,6 +49,8 @@ public class SellerFacade implements ISellerFacade {
                 .mobileVerified(seller.isMobileVerified())
                 .businessType(seller.getBusinessType())
                 .businessAddress(seller.getBusinessAddress())
+                .latitude(seller.getLatitude())
+                .longitude(seller.getLongitude())
                 .productCategoryId(seller.getProductCategory() == null ? null : seller.getProductCategory().getId())
                 .productCategoryName(seller.getProductCategory() == null ? null : seller.getProductCategory().getName())
                 .status(seller.getStatus())

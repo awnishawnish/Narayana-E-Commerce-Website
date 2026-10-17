@@ -12,4 +12,6 @@ import lombok.NoArgsConstructor;
 public class PaymentItemEvent {
     private Long productId;
     private Long quantity;
+    private String productTitle;
+    private String sellerEmail;
 }
