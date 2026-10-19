@@ -21,15 +21,12 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vendor/products")
 @AllArgsConstructor
-public class VendorProductController {
+public class VendorProductController implements NarayanGroup.example.E_Commerce.controller.IVendorProductController {
 
     private static final Logger logger = org.slf4j.LoggerFactory.getLogger(VendorProductController.class);
 
     private final IVendorProductFacade vendorProductFacade;
-
-    @PostMapping("/add")
     public ResponseEntity<ResponseMessageUtilityDTO> addProduct(
             @RequestPart("image") MultipartFile image,
             @RequestPart("product") String product,
@@ -40,8 +37,6 @@ public class VendorProductController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(vendorProductFacade.addProduct(authentication.getName(), image, request));
     }
-
-    @PostMapping("/add-bulk")
     public ResponseEntity<ResponseMessageUtilityDTO> addProducts(
             @RequestPart("products") String products,
             @RequestPart("images") List<MultipartFile> images,
@@ -65,8 +60,6 @@ public class VendorProductController {
         logger.info("getProducts called by user={}", authentication != null ? authentication.getName() : "anonymous");
         return ResponseEntity.ok(vendorProductFacade.getProducts(authentication.getName(), pageable));
     }
-
-    @PutMapping("/{id}")
     public ResponseEntity<ResponseMessageUtilityDTO> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductUpdateRequestDTO request,
@@ -75,8 +68,6 @@ public class VendorProductController {
         logger.info("updateProduct called by user={} id={}", authentication != null ? authentication.getName() : "anonymous", id);
         return ResponseEntity.ok(vendorProductFacade.updateProduct(authentication.getName(), id, request));
     }
-
-    @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessageUtilityDTO> deleteProduct(
             @PathVariable Long id,
             Authentication authentication
@@ -84,8 +75,6 @@ public class VendorProductController {
         logger.info("deleteProduct called by user={} id={}", authentication != null ? authentication.getName() : "anonymous", id);
         return ResponseEntity.ok(vendorProductFacade.deleteProduct(authentication.getName(), id));
     }
-
-    @PatchMapping("/{id}/quantity")
     public ResponseEntity<ResponseMessageUtilityDTO> adjustQuantity(
             @PathVariable Long id,
             @RequestParam int delta,
@@ -94,8 +83,6 @@ public class VendorProductController {
         logger.info("adjustQuantity called by user={} id={} delta={}", authentication != null ? authentication.getName() : "anonymous", id, delta);
         return ResponseEntity.ok(vendorProductFacade.adjustQuantity(authentication.getName(), id, delta));
     }
-
-    @GetMapping("/rename")
     public String rename(){
 
         return "awnish sing ";

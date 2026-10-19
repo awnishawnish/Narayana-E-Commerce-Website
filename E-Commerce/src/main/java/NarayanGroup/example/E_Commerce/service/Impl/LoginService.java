@@ -5,6 +5,7 @@ import java.util.List;
 
 import NarayanGroup.example.E_Commerce.model.Entity.UserEntity;
 import NarayanGroup.example.E_Commerce.model.Repositry.IUserRepository;
+import NarayanGroup.example.E_Commerce.service.ILoginService;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 @Service
 @Lazy
 @AllArgsConstructor
-public class LoginService implements UserDetailsService {
+public class LoginService implements ILoginService {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginService.class);
 

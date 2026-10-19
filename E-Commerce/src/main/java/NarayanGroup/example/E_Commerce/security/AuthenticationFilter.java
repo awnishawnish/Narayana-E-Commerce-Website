@@ -3,7 +3,7 @@ package NarayanGroup.example.E_Commerce.security;
 import NarayanGroup.example.E_Commerce.constant.ErrorConstants;
 import NarayanGroup.example.E_Commerce.model.Enum.Role;
 import NarayanGroup.example.E_Commerce.service.ISellerService;
-import NarayanGroup.example.E_Commerce.service.Impl.LoginService;
+import NarayanGroup.example.E_Commerce.service.ILoginService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ import java.util.Collections;
 public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final LoginService loginService;
+    private final ILoginService loginService;
     private final ISellerService sellerService;
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();

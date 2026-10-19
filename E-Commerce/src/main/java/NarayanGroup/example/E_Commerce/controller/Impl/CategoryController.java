@@ -11,29 +11,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/category")
 @AllArgsConstructor
-public class  CategoryController {
+public class CategoryController implements NarayanGroup.example.E_Commerce.controller.ICategoryController {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(CategoryController.class);
 
     private final ICategoryFacade categoryFacade;
-
-    @GetMapping("/all")
     public ResponseEntity<ResponseMessageUtilityDTO> getCategories() {
         logger.info("getCategories called");
         return ResponseEntity.ok(categoryFacade.getCategories());
     }
-
-    @GetMapping("/{categoryId}/subcategories")
     public ResponseEntity<ResponseMessageUtilityDTO> getSubcategories(
             @PathVariable Long categoryId
     ) {
         logger.info("getSubcategories called for categoryId={}", categoryId);
         return ResponseEntity.ok(categoryFacade.getSubcategories(categoryId));
     }
-
-    @PostMapping("/custom")
     public ResponseEntity<ResponseMessageUtilityDTO> createCustomCategory(
             @Valid @RequestBody CustomCategoryRequestDTO request,
             Authentication authentication
@@ -42,8 +35,6 @@ public class  CategoryController {
         return ResponseEntity.status(201)
                 .body(categoryFacade.createCustomCategory(authentication.getName(), request));
     }
-
-    @PostMapping("/{categoryId}/custom-subcategory")
     public ResponseEntity<ResponseMessageUtilityDTO> createCustomSubcategory(
             @PathVariable Long categoryId,
             @Valid @RequestBody CustomSubcategoryRequestDTO request,

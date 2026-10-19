@@ -8,9 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/vendor/categories")
 @AllArgsConstructor
-public class VendorCategoryController {
+public class VendorCategoryController implements NarayanGroup.example.E_Commerce.controller.IVendorCategoryController {
 
     private static final org.slf4j.Logger logger = org.slf4j.LoggerFactory.getLogger(VendorCategoryController.class);
 
@@ -21,8 +20,6 @@ public class VendorCategoryController {
         logger.info("getCategories (vendor) called by user={}", authentication != null ? authentication.getName() : "anonymous");
         return ResponseEntity.ok(categoryFacade.getCategoriesForSeller(authentication.getName()));
     }
-
-    @GetMapping("/{categoryId}/subcategories")
     public ResponseEntity<ResponseMessageUtilityDTO> getSubcategories(
             @PathVariable Long categoryId,
             Authentication authentication
