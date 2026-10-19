@@ -52,6 +52,7 @@ public class Inventory extends BaseEntity {
 
     @PrePersist
     protected void onCreate() {
+        super.onCreate();
 
         if (availableQuantity == null) {
             availableQuantity = 0L;
